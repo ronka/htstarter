@@ -1,16 +1,12 @@
-import { auth } from "@clerk/nextjs/server";
-import { redirect } from "next/navigation";
-import { EditProfileForm } from "./EditProfileForm";
-import { Button } from "@/components/ui/button";
-import Link from "next/link";
+"use client";
 
-interface EditProfilePageProps {
-  params: { id: string };
-}
+import { useAuth } from "@clerk/nextjs";
+import { useRouter, useParams } from "next/navigation";
+import { EditProfileForm } from "./EditProfileForm";
+import { useEffect, useState } from "react";
 
 // Mock function to get user data - replace with your actual data fetching logic
 async function getUserProfile(id: string) {
-  console.log("Fetching profile for id:", id);
   // In a real app, you would fetch this from your database
   return {
     name: "Sarah Chen",
@@ -42,29 +38,30 @@ async function getUserProfile(id: string) {
   };
 }
 
-export default async function EditProfilePage({
-  params,
-}: EditProfilePageProps) {
-  const { userId } = await auth();
-  const profileId = params.id;
+export default function EditProfilePage() {
+  const { userId } = useAuth();
+  const params = useParams();
+  const router = useRouter();
+  const profileId = params.id as string;
+  const [userProfileData, setUserProfileData] = useState<any>(null);
+  const [loading, setLoading] = useState(true);
 
-  console.log("--- Authorizing Profile Edit Page ---");
-  console.log("Clerk User ID:", userId);
-  console.log("URL Profile ID:", profileId);
-  console.log("Do they match?", userId === profileId);
-  console.log("------------------------------------");
+  useEffect(() => {
+    if (!userId) {
+      router.replace("/sign-in");
+      return;
+    }
+    if (userId !== profileId) {
+      router.replace("/");
+      return;
+    }
+    getUserProfile(profileId).then((data) => {
+      setUserProfileData(data);
+      setLoading(false);
+    });
+  }, [userId, profileId, router]);
 
-  if (!userId) {
-    // This should be handled by middleware, but as a fallback
-    redirect("/sign-in");
-  }
-
-  if (userId !== profileId) {
-    redirect("/");
-  }
-
-  // Fetch the user's current data
-  const userProfileData = await getUserProfile(profileId);
+  if (loading || !userProfileData) return null;
 
   return <EditProfileForm id={profileId} initialData={userProfileData} />;
 }
