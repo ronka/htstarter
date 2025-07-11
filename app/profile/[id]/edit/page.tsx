@@ -5,9 +5,7 @@ import { Button } from "@/components/ui/button";
 import Link from "next/link";
 
 interface EditProfilePageProps {
-  params: {
-    id: string;
-  };
+  params: { id: string };
 }
 
 // Mock function to get user data - replace with your actual data fetching logic
