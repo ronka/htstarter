@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
@@ -35,6 +36,7 @@ interface ProjectFormData {
 
 export default function SubmitPage() {
   const router = useRouter();
+  const { userId } = useAuth();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
@@ -171,7 +173,13 @@ export default function SubmitPage() {
   };
 
   const handleSubmit = () => {
-    console.log("Submitting project:", formData);
+    if (!userId) {
+      console.error("User is not authenticated.");
+      // Optionally, redirect to sign-in or show a message
+      router.push("/sign-in");
+      return;
+    }
+    console.log("Submitting project for user:", userId, formData);
     // Here you would typically send the data to your backend
     router.push("/");
   };

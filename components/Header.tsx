@@ -1,7 +1,18 @@
+"use client";
+
 import Link from "next/link";
+import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import {
+  SignInButton,
+  SignOutButton,
+  SignedIn,
+  SignedOut,
+} from "@clerk/nextjs";
 
 const Header = () => {
+  const { userId } = useAuth();
+
   return (
     <header className="bg-white border-b shadow-sm sticky top-0 z-50">
       <div className="max-w-7xl mx-auto px-4">
@@ -45,9 +56,27 @@ const Header = () => {
           </nav>
 
           <div className="flex items-center gap-3">
-            <Button variant="outline" size="sm">
-              התחבר
-            </Button>
+            <SignedOut>
+              <SignInButton>
+                <Button variant="outline" size="sm">
+                  התחבר
+                </Button>
+              </SignInButton>
+            </SignedOut>
+            <SignedIn>
+              {userId && (
+                <Link href={`/profile/${userId}/edit`}>
+                  <Button variant="outline" size="sm">
+                    הפרופיל שלי
+                  </Button>
+                </Link>
+              )}
+              <SignOutButton>
+                <Button variant="ghost" size="sm">
+                  התנתק
+                </Button>
+              </SignOutButton>
+            </SignedIn>
             <Link href="/submit">
               <Button
                 size="sm"
