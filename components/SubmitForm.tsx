@@ -4,7 +4,8 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { X } from "lucide-react";
+import { X, Loader2 } from "lucide-react";
+import { toast } from "sonner";
 
 interface SubmitFormProps {
   onClose: () => void;
@@ -20,12 +21,67 @@ const SubmitForm = ({ onClose }: SubmitFormProps) => {
     technologies: "",
     category: "lovable",
   });
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Submitting project:", formData);
-    // Here you would typically send the data to your backend
-    onClose();
+
+    if (isSubmitting) return;
+
+    setIsSubmitting(true);
+
+    try {
+      const technologiesArray = formData.technologies
+        .split(",")
+        .map((tech) => tech.trim())
+        .filter((tech) => tech.length > 0);
+
+      const response = await fetch("/api/projects", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          title: formData.title,
+          description: formData.description,
+          image: formData.image || undefined,
+          liveUrl: formData.liveUrl,
+          githubUrl: formData.githubUrl || undefined,
+          technologies: technologiesArray,
+          categoryId: getCategoryId(formData.category),
+        }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok && data.success) {
+        toast.success("Project submitted successfully!");
+        onClose();
+        // Optionally refresh the page or update the project list
+        window.location.reload();
+      } else {
+        throw new Error(data.error || "Failed to submit project");
+      }
+    } catch (error) {
+      console.error("Error submitting project:", error);
+      toast.error(
+        error instanceof Error ? error.message : "Failed to submit project"
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const getCategoryId = (categorySlug: string): number => {
+    const categoryMap: Record<string, number> = {
+      chef: 3,
+      convex: 4,
+      lovable: 1,
+      cursor: 2,
+      bolt: 5,
+      replit: 6,
+    };
+    return categoryMap[categorySlug] || 1;
   };
 
   const handleChange = (
@@ -156,10 +212,22 @@ const SubmitForm = ({ onClose }: SubmitFormProps) => {
             </div>
 
             <div className="flex gap-3 pt-4 flex-row-reverse">
-              <Button type="submit" className="flex-1">
-                שלח פרויקט
+              <Button type="submit" className="flex-1" disabled={isSubmitting}>
+                {isSubmitting ? (
+                  <>
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                    שולח...
+                  </>
+                ) : (
+                  "שלח פרויקט"
+                )}
               </Button>
-              <Button type="button" variant="outline" onClick={onClose}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={onClose}
+                disabled={isSubmitting}
+              >
                 בטל
               </Button>
             </div>
