@@ -1,31 +1,13 @@
 import { useQuery } from "@tanstack/react-query";
-
-interface UserProfile {
-  id: string;
-  name: string;
-  avatar?: string;
-  bio?: string;
-  location?: string;
-  joinedDate?: string;
-  experience?: string;
-  website?: string;
-  github?: string;
-  twitter?: string;
-  skills?: string[];
-  projects?: any[];
-  followers?: number;
-  following?: number;
-  createdAt: string;
-  updatedAt: string;
-}
+import { User } from "@/types/profile";
 
 interface UserProfileResponse {
   success: boolean;
-  data: UserProfile;
+  data: User;
   error?: string;
 }
 
-async function fetchUserProfile(id: string): Promise<UserProfile> {
+async function fetchUserProfile(id: string): Promise<User> {
   const response = await fetch(`/api/users/${id}`);
 
   if (!response.ok) {
