@@ -5,6 +5,7 @@ import "./globals.css";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
+import { Providers } from "@/components/Providers";
 
 const notoSansHebrew = Noto_Sans_Hebrew({
   subsets: ["hebrew", "latin"],
@@ -26,17 +27,19 @@ export default function RootLayout({
     <ClerkProvider>
       <html lang="he" dir="rtl" suppressHydrationWarning>
         <body className={notoSansHebrew.className}>
-          <ThemeProvider
-            attribute="class"
-            defaultTheme="light"
-            enableSystem={false}
-            disableTransitionOnChange
-          >
-            <TooltipProvider>
-              {children}
-              <Toaster />
-            </TooltipProvider>
-          </ThemeProvider>
+          <Providers>
+            <ThemeProvider
+              attribute="class"
+              defaultTheme="light"
+              enableSystem={false}
+              disableTransitionOnChange
+            >
+              <TooltipProvider>
+                {children}
+                <Toaster />
+              </TooltipProvider>
+            </ThemeProvider>
+          </Providers>
         </body>
       </html>
     </ClerkProvider>
