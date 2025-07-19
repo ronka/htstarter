@@ -5,9 +5,9 @@ import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, isAuthorized } from "../../../../lib/auth";
 
-// Validation schema for updating a user
-const updateUserSchema = z.object({
-  name: z.string().min(1, "Name is required").max(100).optional(),
+// Validation schema for creating/updating a user
+const userSchema = z.object({
+  name: z.string().min(1, "Name is required").max(100),
   bio: z.string().max(500).optional(),
   location: z.string().max(100).optional(),
   experience: z.string().max(100).optional(),
@@ -88,17 +88,91 @@ export async function GET(
   }
 }
 
-// PUT /api/users/[id]
+// POST /api/users/[id] - Create a new user
+export async function POST(
+  request: NextRequest,
+  { params }: { params: { id: string } }
+) {
+  try {
+    const clerkUser = await requireAuth();
+    const userId = params.id;
+    const body = await request.json();
+
+    if (!isAuthorized(clerkUser.id, userId)) {
+      return NextResponse.json(
+        { success: false, error: "Unauthorized" },
+        { status: 403 }
+      );
+    }
+
+    // Check if user already exists
+    const existingUser = await db
+      .select({ id: users.id })
+      .from(users)
+      .where(eq(users.id, userId))
+      .limit(1);
+
+    if (existingUser[0]) {
+      return NextResponse.json(
+        { success: false, error: "User already exists" },
+        { status: 409 }
+      );
+    }
+
+    // Validate input
+    const validatedData = userSchema.parse(body);
+
+    // Create new user
+    const [newUser] = await db
+      .insert(users)
+      .values({
+        id: userId,
+        name: validatedData.name,
+        bio: validatedData.bio || null,
+        location: validatedData.location || null,
+        experience: validatedData.experience || null,
+        website: validatedData.website || null,
+        github: validatedData.github || null,
+        twitter: validatedData.twitter || null,
+        skills: validatedData.skills || [],
+        joinedDate: new Date().toISOString(),
+      })
+      .returning();
+
+    return NextResponse.json(
+      {
+        success: true,
+        data: newUser,
+      },
+      { status: 201 }
+    );
+  } catch (error) {
+    if (error instanceof z.ZodError) {
+      return NextResponse.json(
+        { success: false, error: "Validation error", details: error.errors },
+        { status: 400 }
+      );
+    }
+
+    console.error("Error creating user:", error);
+    return NextResponse.json(
+      { success: false, error: "Failed to create user" },
+      { status: 500 }
+    );
+  }
+}
+
+// PUT /api/users/[id] - Update existing user or create if doesn't exist
 export async function PUT(
   request: NextRequest,
   { params }: { params: { id: string } }
 ) {
   try {
-    const user = await requireAuth();
+    const clerkUser = await requireAuth();
     const userId = params.id;
     const body = await request.json();
 
-    if (!isAuthorized(user.id, userId)) {
+    if (!isAuthorized(clerkUser.id, userId)) {
       return NextResponse.json(
         { success: false, error: "Unauthorized" },
         { status: 403 }
@@ -106,28 +180,53 @@ export async function PUT(
     }
 
     // Validate input
-    const validatedData = updateUserSchema.parse(body);
+    const validatedData = userSchema.parse(body);
 
-    // Update user
-    const [updatedUser] = await db
-      .update(users)
-      .set({
-        ...validatedData,
-        updatedAt: new Date(),
-      })
+    // Check if user exists
+    const existingUser = await db
+      .select({ id: users.id })
+      .from(users)
       .where(eq(users.id, userId))
-      .returning();
+      .limit(1);
 
-    if (!updatedUser) {
-      return NextResponse.json(
-        { success: false, error: "User not found" },
-        { status: 404 }
-      );
+    let result;
+
+    if (existingUser[0]) {
+      // Update existing user
+      const [updatedUser] = await db
+        .update(users)
+        .set({
+          ...validatedData,
+          updatedAt: new Date(),
+        })
+        .where(eq(users.id, userId))
+        .returning();
+
+      result = updatedUser;
+    } else {
+      // Create new user
+      const [newUser] = await db
+        .insert(users)
+        .values({
+          id: userId,
+          name: validatedData.name,
+          bio: validatedData.bio || null,
+          location: validatedData.location || null,
+          experience: validatedData.experience || null,
+          website: validatedData.website || null,
+          github: validatedData.github || null,
+          twitter: validatedData.twitter || null,
+          skills: validatedData.skills || [],
+          joinedDate: new Date().toISOString(),
+        })
+        .returning();
+
+      result = newUser;
     }
 
     return NextResponse.json({
       success: true,
-      data: updatedUser,
+      data: result,
     });
   } catch (error) {
     if (error instanceof z.ZodError) {
@@ -137,9 +236,9 @@ export async function PUT(
       );
     }
 
-    console.error("Error updating user:", error);
+    console.error("Error updating/creating user:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to update user" },
+      { success: false, error: "Failed to update/create user" },
       { status: 500 }
     );
   }

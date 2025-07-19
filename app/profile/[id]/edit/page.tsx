@@ -60,19 +60,24 @@ export default function EditProfilePage() {
     const errorMessage =
       error instanceof Error ? error.message : "Failed to load profile";
 
-    // If user not found, show empty form with message
+    // If user not found, show empty form with message for new user
     if (errorMessage === "User not found") {
       return (
         <>
           <div
-            className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded relative"
+            className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded relative"
             role="alert"
           >
             <span className="block sm:inline">
-              Profile not found. You can create a new profile below.
+              Welcome! Let's create your profile. Fill in the details below to
+              get started.
             </span>
           </div>
-          <EditProfileForm id={profileId} initialData={defaultProfileData} />
+          <EditProfileForm
+            id={profileId}
+            initialData={defaultProfileData}
+            isNewUser={true}
+          />
         </>
       );
     }
@@ -109,5 +114,7 @@ export default function EditProfilePage() {
       }
     : defaultProfileData;
 
-  return <EditProfileForm id={profileId} initialData={formData} />;
+  return (
+    <EditProfileForm id={profileId} initialData={formData} isNewUser={false} />
+  );
 }

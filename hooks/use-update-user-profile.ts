@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
 
 interface UpdateUserProfileData {
-  name?: string;
+  name: string; // Required for user creation
   bio?: string;
   location?: string;
   experience?: string;
@@ -35,8 +35,9 @@ async function updateUserProfile(
     if (response.status === 403) {
       throw new Error("Unauthorized to update this profile");
     }
-    if (response.status === 404) {
-      throw new Error("User not found");
+    if (response.status === 400) {
+      const errorData = await response.json();
+      throw new Error(errorData.error || "Invalid data provided");
     }
     throw new Error("Failed to update profile");
   }
@@ -69,8 +70,8 @@ export function useUpdateUserProfile() {
 
       // Show success toast
       toast({
-        title: "Profile updated!",
-        description: "Your profile has been successfully updated.",
+        title: "Profile saved!",
+        description: "Your profile has been successfully saved.",
       });
 
       // Navigate to profile page
@@ -79,7 +80,7 @@ export function useUpdateUserProfile() {
     onError: (error: Error) => {
       // Show error toast
       toast({
-        title: "Update failed",
+        title: "Save failed",
         description: error.message,
         variant: "destructive",
       });

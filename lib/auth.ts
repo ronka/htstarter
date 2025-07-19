@@ -23,6 +23,16 @@ export async function getCurrentUser() {
   }
 }
 
+export async function getClerkUser() {
+  const { userId } = await auth();
+
+  if (!userId) {
+    return null;
+  }
+
+  return { id: userId };
+}
+
 export async function createUserIfNotExists(clerkUser: any) {
   if (!clerkUser?.id) {
     throw new Error("Invalid user data");
@@ -73,10 +83,20 @@ export async function createUserIfNotExists(clerkUser: any) {
 }
 
 export async function requireAuth() {
+  const clerkUser = await getClerkUser();
+
+  if (!clerkUser) {
+    throw new Error("Authentication required");
+  }
+
+  return clerkUser;
+}
+
+export async function requireExistingUser() {
   const user = await getCurrentUser();
 
   if (!user) {
-    throw new Error("Authentication required");
+    throw new Error("User not found in database");
   }
 
   return user;

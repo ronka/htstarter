@@ -36,9 +36,14 @@ interface UserProfile {
 interface EditProfileFormProps {
   id: string;
   initialData: UserProfile;
+  isNewUser?: boolean;
 }
 
-export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
+export function EditProfileForm({
+  id,
+  initialData,
+  isNewUser = false,
+}: EditProfileFormProps) {
   const router = useRouter();
   const updateProfileMutation = useUpdateUserProfile();
 
@@ -114,9 +119,15 @@ export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Validate required fields
+    if (!formData.name.trim()) {
+      alert("Name is required");
+      return;
+    }
+
     // Transform form data to match API expectations
     const updateData = {
-      name: formData.name,
+      name: formData.name.trim(),
       bio: formData.bio,
       location: formData.location,
       experience: formData.title, // Map title to experience field
@@ -146,7 +157,9 @@ export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
 
         <Card>
           <CardHeader>
-            <CardTitle className="text-2xl">Edit Profile</CardTitle>
+            <CardTitle className="text-2xl">
+              {isNewUser ? "Create Profile" : "Edit Profile"}
+            </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
@@ -155,7 +168,7 @@ export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
                 <h3 className="text-lg font-semibold">Basic Information</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name</Label>
+                    <Label htmlFor="name">Full Name *</Label>
                     <Input
                       id="name"
                       value={formData.name}
@@ -163,6 +176,7 @@ export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
                         handleInputChange("name", e.target.value)
                       }
                       placeholder="Enter your full name"
+                      required
                     />
                   </div>
 
@@ -346,6 +360,8 @@ export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
                 >
                   {updateProfileMutation.isPending
                     ? "Saving..."
+                    : isNewUser
+                    ? "Create Profile"
                     : "Save Changes"}
                 </Button>
               </div>
