@@ -7,17 +7,23 @@ import { requireAuth, isAuthorized } from "../../../../lib/auth";
 
 // Validation schema for updating a project
 const updateProjectSchema = z.object({
-  title: z.string().min(1, "Title is required").max(200).optional(),
-  description: z
+  title: z.string().min(1, "Title is required").max(200),
+  description: z.string().min(1, "Description is required").max(2000),
+  image: z
     .string()
-    .min(1, "Description is required")
-    .max(2000)
-    .optional(),
-  image: z.string().url().optional(),
-  technologies: z.array(z.string()).optional(),
-  categoryId: z.number().optional(),
-  liveUrl: z.string().url().optional(),
-  githubUrl: z.string().url().optional(),
+    .optional()
+    .refine((val) => !val || val === "" || /^https?:\/\/.+/.test(val), {
+      message: "Image must be a valid URL or empty",
+    }),
+  technologies: z.array(z.string()),
+  categoryId: z.number(),
+  liveUrl: z.string().url("Live URL must be a valid URL"),
+  githubUrl: z
+    .string()
+    .optional()
+    .refine((val) => !val || val === "" || /^https?:\/\/.+/.test(val), {
+      message: "GitHub URL must be a valid URL or empty",
+    }),
   features: z.array(z.string()).optional(),
   techDetails: z.string().optional(),
   challenges: z.string().optional(),
@@ -115,6 +121,8 @@ export async function PUT(
     const projectId = parseInt(id);
     const body = await request.json();
 
+    console.log("PUT request body:", body);
+
     if (isNaN(projectId)) {
       return NextResponse.json(
         { success: false, error: "Invalid project ID" },
@@ -144,7 +152,24 @@ export async function PUT(
     }
 
     // Validate input
-    const validatedData = updateProjectSchema.parse(body);
+    let validatedData;
+    try {
+      validatedData = updateProjectSchema.parse(body);
+      console.log("Validated data:", validatedData);
+    } catch (validationError) {
+      console.error("Validation error:", validationError);
+      if (validationError instanceof z.ZodError) {
+        return NextResponse.json(
+          {
+            success: false,
+            error: "Validation error",
+            details: validationError.errors,
+          },
+          { status: 400 }
+        );
+      }
+      throw validationError;
+    }
 
     // Update project
     const [updatedProject] = await db
@@ -156,19 +181,26 @@ export async function PUT(
       .where(eq(projects.id, projectId))
       .returning();
 
+    console.log("Updated project:", updatedProject);
+
     return NextResponse.json({
       success: true,
       data: updatedProject,
     });
   } catch (error) {
+    console.error("Error updating project:", error);
+
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { success: false, error: "Validation error", details: error.errors },
+        {
+          success: false,
+          error: "Validation error",
+          details: error.errors,
+        },
         { status: 400 }
       );
     }
 
-    console.error("Error updating project:", error);
     return NextResponse.json(
       { success: false, error: "Failed to update project" },
       { status: 500 }

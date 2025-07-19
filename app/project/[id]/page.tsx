@@ -77,6 +77,8 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
               features={project.features}
               techDetails={project.techDetails}
               challenges={project.challenges}
+              authorId={project.author.id}
+              projectId={project.id.toString()}
             />
           </div>
 
