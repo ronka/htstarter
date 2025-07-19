@@ -6,6 +6,17 @@ interface ExperienceSectionProps {
 }
 
 const ExperienceSection = ({ experience }: ExperienceSectionProps) => {
+  const formatExperienceDuration = (exp: Experience) => {
+    const startDate = `${exp.startMonth} ${exp.startYear}`;
+    if (exp.isCurrentlyWorking) {
+      return `${startDate} - הווה`;
+    }
+    if (exp.endMonth && exp.endYear) {
+      return `${startDate} - ${exp.endMonth} ${exp.endYear}`;
+    }
+    return startDate;
+  };
+
   const renderExperience = () => {
     try {
       const parsedExperience =
@@ -40,7 +51,9 @@ const ExperienceSection = ({ experience }: ExperienceSectionProps) => {
                     {exp.title}
                   </h4>
                   <p className="text-blue-600 text-sm mb-1">{exp.company}</p>
-                  <p className="text-gray-500 text-sm mb-2">{exp.duration}</p>
+                  <p className="text-gray-500 text-sm mb-2">
+                    {formatExperienceDuration(exp)}
+                  </p>
                   <p className="text-gray-700 text-sm">{exp.description}</p>
                 </div>
               </div>

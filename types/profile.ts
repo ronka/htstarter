@@ -18,7 +18,11 @@ export interface User {
 export interface Experience {
   title: string;
   company: string;
-  duration: string;
+  startMonth: string;
+  startYear: string;
+  endMonth: string;
+  endYear: string;
+  isCurrentlyWorking: boolean;
   description: string;
 }
 

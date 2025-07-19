@@ -2,6 +2,7 @@
 
 import { useAuth } from "@clerk/nextjs";
 import { useRouter, useParams } from "next/navigation";
+import { useEffect } from "react";
 import { EditProfileForm } from "./EditProfileForm";
 import { useUserProfile } from "@/hooks/use-user-profile";
 
@@ -32,16 +33,18 @@ export default function EditProfilePage() {
     isError,
   } = useUserProfile(profileId);
 
-  // Handle authentication and authorization
-  if (!userId) {
-    router.replace("/sign-in");
-    return null;
-  }
+  // Handle authentication and authorization using useEffect
+  useEffect(() => {
+    if (!userId) {
+      router.replace("/sign-in");
+      return;
+    }
 
-  if (userId !== profileId) {
-    router.replace("/");
-    return null;
-  }
+    if (userId !== profileId) {
+      router.replace("/");
+      return;
+    }
+  }, [userId, profileId, router]);
 
   // Show loading state
   if (isLoading) {

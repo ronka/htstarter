@@ -9,6 +9,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
+import { Checkbox } from "@/components/ui/checkbox";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 import { ArrowLeft, X, Plus } from "lucide-react";
 import Header from "@/components/Header";
 import { useUpdateUserProfile } from "@/hooks/use-update-user-profile";
@@ -16,7 +24,11 @@ import { useUpdateUserProfile } from "@/hooks/use-update-user-profile";
 interface Experience {
   title: string;
   company: string;
-  duration: string;
+  startMonth: string;
+  startYear: string;
+  endMonth: string;
+  endYear: string;
+  isCurrentlyWorking: boolean;
   description: string;
 }
 
@@ -39,6 +51,24 @@ interface EditProfileFormProps {
   isNewUser?: boolean;
 }
 
+const months = [
+  "ינואר",
+  "פברואר",
+  "מרץ",
+  "אפריל",
+  "מאי",
+  "יוני",
+  "יולי",
+  "אוגוסט",
+  "ספטמבר",
+  "אוקטובר",
+  "נובמבר",
+  "דצמבר",
+];
+
+const currentYear = new Date().getFullYear();
+const years = Array.from({ length: 50 }, (_, i) => currentYear - i);
+
 export function EditProfileForm({
   id,
   initialData,
@@ -52,7 +82,11 @@ export function EditProfileForm({
   const [newExperience, setNewExperience] = useState<Experience>({
     title: "",
     company: "",
-    duration: "",
+    startMonth: "",
+    startYear: "",
+    endMonth: "",
+    endYear: "",
+    isCurrentlyWorking: false,
     description: "",
   });
 
@@ -83,7 +117,7 @@ export function EditProfileForm({
   const handleExperienceChange = (
     index: number,
     field: keyof Experience,
-    value: string
+    value: string | boolean
   ) => {
     setFormData((prev) => ({
       ...prev,
@@ -94,7 +128,12 @@ export function EditProfileForm({
   };
 
   const handleAddExperience = () => {
-    if (newExperience.title && newExperience.company) {
+    if (
+      newExperience.title &&
+      newExperience.company &&
+      newExperience.startMonth &&
+      newExperience.startYear
+    ) {
       setFormData((prev) => ({
         ...prev,
         experience: [...prev.experience, newExperience],
@@ -102,7 +141,11 @@ export function EditProfileForm({
       setNewExperience({
         title: "",
         company: "",
-        duration: "",
+        startMonth: "",
+        startYear: "",
+        endMonth: "",
+        endYear: "",
+        isCurrentlyWorking: false,
         description: "",
       });
     }
@@ -115,12 +158,22 @@ export function EditProfileForm({
     }));
   };
 
+  const handleNewExperienceChange = (
+    field: keyof Experience,
+    value: string | boolean
+  ) => {
+    setNewExperience((prev) => ({
+      ...prev,
+      [field]: value,
+    }));
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
 
     // Validate required fields
     if (!formData.name.trim()) {
-      alert("Name is required");
+      alert("שם הוא שדה חובה");
       return;
     }
 
@@ -142,6 +195,17 @@ export function EditProfileForm({
     updateProfileMutation.mutate({ userId: id, data: updateData });
   };
 
+  const formatExperienceDuration = (exp: Experience) => {
+    const startDate = `${exp.startMonth} ${exp.startYear}`;
+    if (exp.isCurrentlyWorking) {
+      return `${startDate} - הווה`;
+    }
+    if (exp.endMonth && exp.endYear) {
+      return `${startDate} - ${exp.endMonth} ${exp.endYear}`;
+    }
+    return startDate;
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <Header />
@@ -153,61 +217,61 @@ export function EditProfileForm({
             className="inline-flex items-center gap-2 text-gray-600 hover:text-gray-900 transition-colors"
           >
             <ArrowLeft className="w-4 h-4" />
-            Back to Profile
+            חזרה לפרופיל
           </Link>
         </div>
 
         <Card>
           <CardHeader>
             <CardTitle className="text-2xl">
-              {isNewUser ? "Create Profile" : "Edit Profile"}
+              {isNewUser ? "יצירת פרופיל" : "עריכת פרופיל"}
             </CardTitle>
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Basic Information */}
               <div className="space-y-6">
-                <h3 className="text-lg font-semibold">Basic Information</h3>
+                <h3 className="text-lg font-semibold">מידע בסיסי</h3>
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-2">
-                    <Label htmlFor="name">Full Name *</Label>
+                    <Label htmlFor="name">שם מלא * (שדה חובה)</Label>
                     <Input
                       id="name"
                       value={formData.name}
                       onChange={(e) =>
                         handleInputChange("name", e.target.value)
                       }
-                      placeholder="Enter your full name"
+                      placeholder="הכנס את שמך המלא"
                       required
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="title">Professional Title</Label>
+                    <Label htmlFor="title">תפקיד מקצועי</Label>
                     <Input
                       id="title"
                       value={formData.title}
                       onChange={(e) =>
                         handleInputChange("title", e.target.value)
                       }
-                      placeholder="e.g., Full Stack Developer"
+                      placeholder="למשל, מפתח Full Stack"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="location">Location</Label>
+                    <Label htmlFor="location">מיקום</Label>
                     <Input
                       id="location"
                       value={formData.location}
                       onChange={(e) =>
                         handleInputChange("location", e.target.value)
                       }
-                      placeholder="City, Country"
+                      placeholder="עיר, מדינה"
                     />
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="website">Website</Label>
+                    <Label htmlFor="website">אתר אינטרנט</Label>
                     <Input
                       id="website"
                       type="url"
@@ -220,7 +284,7 @@ export function EditProfileForm({
                   </div>
 
                   <div className="space-y-2">
-                    <Label htmlFor="twitter">Twitter</Label>
+                    <Label htmlFor="twitter">טוויטר</Label>
                     <Input
                       id="twitter"
                       value={formData.twitter}
@@ -245,12 +309,12 @@ export function EditProfileForm({
                 </div>
 
                 <div className="space-y-2">
-                  <Label htmlFor="bio">Bio</Label>
+                  <Label htmlFor="bio">ביוגרפיה</Label>
                   <Textarea
                     id="bio"
                     value={formData.bio}
                     onChange={(e) => handleInputChange("bio", e.target.value)}
-                    placeholder="Tell us a little about yourself"
+                    placeholder="ספר לנו קצת על עצמך"
                     rows={4}
                   />
                 </div>
@@ -258,7 +322,7 @@ export function EditProfileForm({
 
               {/* Skills */}
               <div className="space-y-6">
-                <h3 className="text-lg font-semibold">Skills</h3>
+                <h3 className="text-lg font-semibold">כישורים</h3>
                 <div className="flex flex-wrap gap-2">
                   {formData.skills.map((skill) => (
                     <Badge key={skill} variant="secondary">
@@ -277,7 +341,7 @@ export function EditProfileForm({
                   <Input
                     value={newSkill}
                     onChange={(e) => setNewSkill(e.target.value)}
-                    placeholder="Add a new skill"
+                    placeholder="הוסף כישור חדש"
                   />
                   <Button type="button" onClick={handleAddSkill}>
                     <Plus className="w-4 h-4" />
@@ -287,7 +351,9 @@ export function EditProfileForm({
 
               {/* Experience */}
               <div className="space-y-6">
-                <h3 className="text-lg font-semibold">Work Experience</h3>
+                <h3 className="text-lg font-semibold">
+                  ניסיון תעסוקתי (אופציונלי)
+                </h3>
 
                 {/* Experience Timeline Display */}
                 {formData.experience.length > 0 && (
@@ -318,7 +384,7 @@ export function EditProfileForm({
                               {exp.company}
                             </p>
                             <p className="text-gray-500 text-sm mb-2">
-                              {exp.duration}
+                              {formatExperienceDuration(exp)}
                             </p>
                             <p className="text-gray-700 text-sm">
                               {exp.description}
@@ -332,65 +398,143 @@ export function EditProfileForm({
 
                 {/* Add Experience Form */}
                 <div className="space-y-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                  <h4 className="font-medium text-gray-900">
-                    Add New Experience
-                  </h4>
+                  <h4 className="font-medium text-gray-900">הוסף ניסיון חדש</h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <Label htmlFor="new-exp-title">Job Title</Label>
+                      <Label htmlFor="new-exp-title">תפקיד</Label>
                       <Input
                         id="new-exp-title"
                         value={newExperience.title}
                         onChange={(e) =>
-                          setNewExperience((prev) => ({
-                            ...prev,
-                            title: e.target.value,
-                          }))
+                          handleNewExperienceChange("title", e.target.value)
                         }
-                        placeholder="e.g., Senior Frontend Developer"
+                        placeholder="למשל, מפתח Frontend בכיר"
                       />
                     </div>
                     <div className="space-y-2">
-                      <Label htmlFor="new-exp-company">Company</Label>
+                      <Label htmlFor="new-exp-company">חברה</Label>
                       <Input
                         id="new-exp-company"
                         value={newExperience.company}
                         onChange={(e) =>
-                          setNewExperience((prev) => ({
-                            ...prev,
-                            company: e.target.value,
-                          }))
+                          handleNewExperienceChange("company", e.target.value)
                         }
-                        placeholder="e.g., TechCorp Inc."
+                        placeholder="למשל, TechCorp Inc."
                       />
                     </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label htmlFor="new-exp-duration">Duration</Label>
-                    <Input
-                      id="new-exp-duration"
-                      value={newExperience.duration}
-                      onChange={(e) =>
-                        setNewExperience((prev) => ({
-                          ...prev,
-                          duration: e.target.value,
-                        }))
+
+                  {/* Currently Working Checkbox */}
+                  <div className="flex items-center space-x-2">
+                    <Checkbox
+                      id="currently-working"
+                      checked={newExperience.isCurrentlyWorking}
+                      onCheckedChange={(checked) =>
+                        handleNewExperienceChange(
+                          "isCurrentlyWorking",
+                          checked as boolean
+                        )
                       }
-                      placeholder="e.g., 2022 - Present"
                     />
+                    <Label htmlFor="currently-working" className="text-sm">
+                      אני עובד כרגע בתפקיד זה
+                    </Label>
                   </div>
+
+                  {/* Date Range */}
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>תאריך התחלה</Label>
+                      <div className="flex gap-2">
+                        <Select
+                          value={newExperience.startMonth}
+                          onValueChange={(value) =>
+                            handleNewExperienceChange("startMonth", value)
+                          }
+                        >
+                          <SelectTrigger className="w-1/2">
+                            <SelectValue placeholder="חודש" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {months.map((month, index) => (
+                              <SelectItem key={index} value={month}>
+                                {month}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select
+                          value={newExperience.startYear}
+                          onValueChange={(value) =>
+                            handleNewExperienceChange("startYear", value)
+                          }
+                        >
+                          <SelectTrigger className="w-1/2">
+                            <SelectValue placeholder="שנה" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {years.map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+
+                    <div className="space-y-2">
+                      <Label>תאריך סיום</Label>
+                      <div className="flex gap-2">
+                        <Select
+                          value={newExperience.endMonth}
+                          onValueChange={(value) =>
+                            handleNewExperienceChange("endMonth", value)
+                          }
+                          disabled={newExperience.isCurrentlyWorking}
+                        >
+                          <SelectTrigger className="w-1/2">
+                            <SelectValue placeholder="חודש" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {months.map((month, index) => (
+                              <SelectItem key={index} value={month}>
+                                {month}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                        <Select
+                          value={newExperience.endYear}
+                          onValueChange={(value) =>
+                            handleNewExperienceChange("endYear", value)
+                          }
+                          disabled={newExperience.isCurrentlyWorking}
+                        >
+                          <SelectTrigger className="w-1/2">
+                            <SelectValue placeholder="שנה" />
+                          </SelectTrigger>
+                          <SelectContent>
+                            {years.map((year) => (
+                              <SelectItem key={year} value={year.toString()}>
+                                {year}
+                              </SelectItem>
+                            ))}
+                          </SelectContent>
+                        </Select>
+                      </div>
+                    </div>
+                  </div>
+
                   <div className="space-y-2">
-                    <Label htmlFor="new-exp-description">Description</Label>
+                    <Label htmlFor="new-exp-description">תיאור</Label>
                     <Textarea
                       id="new-exp-description"
                       value={newExperience.description}
                       onChange={(e) =>
-                        setNewExperience((prev) => ({
-                          ...prev,
-                          description: e.target.value,
-                        }))
+                        handleNewExperienceChange("description", e.target.value)
                       }
-                      placeholder="Describe your role and achievements"
+                      placeholder="תאר את תפקידך והישגיך"
                       rows={3}
                     />
                   </div>
@@ -398,9 +542,14 @@ export function EditProfileForm({
                     type="button"
                     variant="outline"
                     onClick={handleAddExperience}
-                    disabled={!newExperience.title || !newExperience.company}
+                    disabled={
+                      !newExperience.title ||
+                      !newExperience.company ||
+                      !newExperience.startMonth ||
+                      !newExperience.startYear
+                    }
                   >
-                    <Plus className="w-4 h-4 mr-2" /> Add Experience
+                    <Plus className="w-4 h-4 mr-2" /> הוסף ניסיון
                   </Button>
                 </div>
               </div>
@@ -411,10 +560,10 @@ export function EditProfileForm({
                   disabled={updateProfileMutation.isPending}
                 >
                   {updateProfileMutation.isPending
-                    ? "Saving..."
+                    ? "שומר..."
                     : isNewUser
-                    ? "Create Profile"
-                    : "Save Changes"}
+                    ? "צור פרופיל"
+                    : "שמור שינויים"}
                 </Button>
               </div>
             </form>
