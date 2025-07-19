@@ -1,0 +1,10 @@
+export { ProjectDetailSkeleton } from "./ProjectDetailSkeleton";
+export { ProjectError } from "./ProjectError";
+export { ProjectHeader } from "./ProjectHeader";
+export { ProjectMain } from "./ProjectMain";
+export { ProjectSidebar } from "./ProjectSidebar";
+export { ProjectImage } from "./ProjectImage";
+export { ProjectContent } from "./ProjectContent";
+export { ProjectActions } from "./ProjectActions";
+export { ProjectAuthor } from "./ProjectAuthor";
+export { ProjectStats } from "./ProjectStats";
