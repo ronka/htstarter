@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
@@ -19,6 +19,8 @@ import {
   ExternalLink,
 } from "lucide-react";
 import Header from "@/components/Header";
+import { useSubmitProject } from "@/hooks/use-submit-project";
+import { useCategories } from "@/hooks/use-categories";
 
 interface ProjectFormData {
   title: string;
@@ -37,6 +39,9 @@ interface ProjectFormData {
 export default function SubmitPage() {
   const router = useRouter();
   const { userId } = useAuth();
+  const submitProjectMutation = useSubmitProject();
+  const { data: categories = [], isLoading: categoriesLoading } =
+    useCategories();
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
@@ -46,7 +51,7 @@ export default function SubmitPage() {
     liveUrl: "",
     githubUrl: "",
     technologies: [],
-    category: "lovable",
+    category: "",
     features: [""],
     techDetails: "",
     challenges: "",
@@ -55,50 +60,29 @@ export default function SubmitPage() {
   const [techInput, setTechInput] = useState("");
   const [imagePreview, setImagePreview] = useState("");
 
-  const categories = [
-    {
-      value: "chef",
-      label: "🧑‍🍳 שף",
-      description: "פרויקטים של עוזר בישול בבינה מלאכותית",
-    },
-    {
-      value: "convex",
-      label: "🟠 קונבקס",
-      description: "פרויקטים של Backend-as-a-service",
-    },
-    {
-      value: "lovable",
-      label: "💙 מקסים",
-      description: "אפליקציות ווב מבוססות בינה מלאכותית",
-    },
-    { value: "tempo", label: "⏱️ טמפו", description: "כלי ניהול זמן" },
-    {
-      value: "cursor",
-      label: "🖱️ קרסור",
-      description: "פרויקטים של עורך קוד עם בינה מלאכותית",
-    },
-    { value: "bolt", label: "⚡ בזק", description: "כלי פיתוח מהיר" },
-    {
-      value: "replit",
-      label: "🔄 רפליט",
-      description: "פרויקטים של Cloud IDE",
-    },
-    {
-      value: "v0",
-      label: "v0 v0",
-      description: "ממשקי משתמש מבוססי Vercel v0",
-    },
-    {
-      value: "windsurf",
-      label: "🏄 וינדסרף",
-      description: "סביבת פיתוח עם בינה מלאכותית",
-    },
-    {
-      value: "base44",
-      label: "🟧 בסיס44",
-      description: "כלי הדמיה של נתונים",
-    },
-  ];
+  // Set default category when categories are loaded
+  useEffect(() => {
+    if (categories.length > 0 && !formData.category) {
+      setFormData((prev) => ({ ...prev, category: categories[0].slug }));
+    }
+  }, [categories, formData.category]);
+
+  // Helper function to get emoji for category
+  const getCategoryEmoji = (slug: string) => {
+    const emojiMap: Record<string, string> = {
+      chef: "🧑‍🍳",
+      convex: "🟠",
+      lovable: "💙",
+      tempo: "⏱️",
+      cursor: "🖱️",
+      bolt: "⚡",
+      replit: "🔄",
+      v0: "v0",
+      windsurf: "🏄",
+      base44: "🟧",
+    };
+    return emojiMap[slug] || "📁";
+  };
 
   const handleInputChange = (field: keyof ProjectFormData, value: string) => {
     setFormData((prev) => ({
@@ -179,9 +163,9 @@ export default function SubmitPage() {
       router.push("/sign-in");
       return;
     }
-    console.log("Submitting project for user:", userId, formData);
-    // Here you would typically send the data to your backend
-    router.push("/");
+
+    // Submit the project using the mutation
+    submitProjectMutation.mutate(formData);
   };
 
   const nextStep = () => {
@@ -335,12 +319,18 @@ export default function SubmitPage() {
                           handleInputChange("category", e.target.value)
                         }
                         className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+                        disabled={categoriesLoading}
                       >
-                        {categories.map((cat) => (
-                          <option key={cat.value} value={cat.value}>
-                            {cat.label} - {cat.description}
-                          </option>
-                        ))}
+                        {categoriesLoading ? (
+                          <option>טוען קטגוריות...</option>
+                        ) : (
+                          categories.map((cat) => (
+                            <option key={cat.slug} value={cat.slug}>
+                              {getCategoryEmoji(cat.slug)} {cat.name} -{" "}
+                              {cat.description || ""}
+                            </option>
+                          ))
+                        )}
                       </select>
                     </div>
                   </div>
@@ -540,8 +530,9 @@ export default function SubmitPage() {
                   <Button
                     onClick={handleSubmit}
                     className="bg-green-600 hover:bg-green-700"
+                    disabled={submitProjectMutation.isPending}
                   >
-                    שלח פרויקט
+                    {submitProjectMutation.isPending ? "שולח..." : "שלח פרויקט"}
                   </Button>
                 )}
               </div>

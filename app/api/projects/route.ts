@@ -150,12 +150,6 @@ export async function POST(request: NextRequest) {
       })
       .returning();
 
-    // Update user's project count
-    await db
-      .update(users)
-      .set({ projects: user.projects + 1 })
-      .where(eq(users.id, user.id));
-
     return NextResponse.json(
       { success: true, data: newProject },
       { status: 201 }
