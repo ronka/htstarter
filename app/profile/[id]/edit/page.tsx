@@ -3,65 +3,111 @@
 import { useAuth } from "@clerk/nextjs";
 import { useRouter, useParams } from "next/navigation";
 import { EditProfileForm } from "./EditProfileForm";
-import { useEffect, useState } from "react";
+import { useUserProfile } from "@/hooks/use-user-profile";
 
-// Mock function to get user data - replace with your actual data fetching logic
-async function getUserProfile(id: string) {
-  // In a real app, you would fetch this from your database
-  return {
-    name: "Sarah Chen",
-    title: "Full Stack Developer & AI Enthusiast",
-    location: "San Francisco, CA",
-    website: "https://sarahchen.dev",
-    twitter: "@sarahchen_dev",
-    github: "sarahchen",
-    bio: "Passionate developer building AI-powered applications. Love creating user-friendly interfaces and solving complex problems with clean, efficient code.",
-    skills: [
-      "React",
-      "TypeScript",
-      "Node.js",
-      "Python",
-      "AWS",
-      "MongoDB",
-      "GraphQL",
-      "Docker",
-    ],
-    experience: [
-      {
-        title: "Senior Frontend Developer",
-        company: "TechCorp Inc.",
-        duration: "2022 - Present",
-        description:
-          "Leading frontend development for AI-powered SaaS platform, managing team of 5 developers.",
-      },
-    ],
-  };
-}
+// Default empty profile data for new users
+const defaultProfileData = {
+  name: "",
+  title: "",
+  location: "",
+  website: "",
+  twitter: "",
+  github: "",
+  bio: "",
+  skills: [],
+  experience: [],
+};
 
 export default function EditProfilePage() {
   const { userId } = useAuth();
   const params = useParams();
   const router = useRouter();
   const profileId = params.id as string;
-  const [userProfileData, setUserProfileData] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (!userId) {
-      router.replace("/sign-in");
-      return;
+  // Use React Query to fetch user profile
+  const {
+    data: userProfileData,
+    isLoading,
+    error,
+    isError,
+  } = useUserProfile(profileId);
+
+  // Handle authentication and authorization
+  if (!userId) {
+    router.replace("/sign-in");
+    return null;
+  }
+
+  if (userId !== profileId) {
+    router.replace("/");
+    return null;
+  }
+
+  // Show loading state
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
+          <p className="mt-2 text-gray-600">Loading profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  // Handle error states
+  if (isError) {
+    const errorMessage =
+      error instanceof Error ? error.message : "Failed to load profile";
+
+    // If user not found, show empty form with message
+    if (errorMessage === "User not found") {
+      return (
+        <>
+          <div
+            className="bg-yellow-50 border border-yellow-200 text-yellow-800 px-4 py-3 rounded relative"
+            role="alert"
+          >
+            <span className="block sm:inline">
+              Profile not found. You can create a new profile below.
+            </span>
+          </div>
+          <EditProfileForm id={profileId} initialData={defaultProfileData} />
+        </>
+      );
     }
-    if (userId !== profileId) {
-      router.replace("/");
-      return;
-    }
-    getUserProfile(profileId).then((data) => {
-      setUserProfileData(data);
-      setLoading(false);
-    });
-  }, [userId, profileId, router]);
 
-  if (loading || !userProfileData) return null;
+    // For other errors, show error message
+    return (
+      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+        <div className="text-center">
+          <p className="text-red-600 mb-4">Failed to load profile</p>
+          <p className="text-gray-600 mb-4">{errorMessage}</p>
+          <button
+            onClick={() => window.location.reload()}
+            className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
+          >
+            Try Again
+          </button>
+        </div>
+      </div>
+    );
+  }
 
-  return <EditProfileForm id={profileId} initialData={userProfileData} />;
+  // Transform API data to match form expectations
+  const formData = userProfileData
+    ? {
+        name: userProfileData.name || "",
+        title: userProfileData.experience || "", // Using experience field as title
+        location: userProfileData.location || "",
+        website: userProfileData.website || "",
+        twitter: userProfileData.twitter || "",
+        github: userProfileData.github || "",
+        bio: userProfileData.bio || "",
+        skills: userProfileData.skills || [],
+        experience: [], // API doesn't have experience array, so we'll start empty
+      }
+    : defaultProfileData;
+
+  return <EditProfileForm id={profileId} initialData={formData} />;
 }

@@ -11,7 +11,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ArrowLeft, X, Plus } from "lucide-react";
 import Header from "@/components/Header";
-import { useToast } from "@/hooks/use-toast";
+import { useUpdateUserProfile } from "@/hooks/use-update-user-profile";
 
 interface Experience {
   title: string;
@@ -40,7 +40,7 @@ interface EditProfileFormProps {
 
 export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
   const router = useRouter();
-  const { toast } = useToast();
+  const updateProfileMutation = useUpdateUserProfile();
 
   const [formData, setFormData] = useState(initialData);
 
@@ -113,13 +113,20 @@ export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    // In a real app, you'd save the data to a backend
-    console.log("Updating profile for user:", id, formData);
-    toast({
-      title: "Profile updated!",
-      description: "Your profile has been successfully updated.",
-    });
-    router.push(`/profile/${id}`);
+
+    // Transform form data to match API expectations
+    const updateData = {
+      name: formData.name,
+      bio: formData.bio,
+      location: formData.location,
+      experience: formData.title, // Map title to experience field
+      website: formData.website,
+      github: formData.github,
+      twitter: formData.twitter,
+      skills: formData.skills,
+    };
+
+    updateProfileMutation.mutate({ userId: id, data: updateData });
   };
 
   return (
@@ -333,7 +340,14 @@ export function EditProfileForm({ id, initialData }: EditProfileFormProps) {
               </div>
 
               <div className="flex justify-end">
-                <Button type="submit">Save Changes</Button>
+                <Button
+                  type="submit"
+                  disabled={updateProfileMutation.isPending}
+                >
+                  {updateProfileMutation.isPending
+                    ? "Saving..."
+                    : "Save Changes"}
+                </Button>
               </div>
             </form>
           </CardContent>
