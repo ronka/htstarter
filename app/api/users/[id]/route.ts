@@ -12,8 +12,8 @@ const userSchema = z.object({
   location: z.string().max(100).optional(),
   experience: z.string().max(100).optional(),
   website: z.string().url().optional(),
-  github: z.string().url().optional(),
-  twitter: z.string().url().optional(),
+  github: z.string().optional(),
+  twitter: z.string().optional(),
   skills: z.array(z.string()).optional(),
 });
 
