@@ -44,7 +44,6 @@ export function EditProfileForm({
   initialData,
   isNewUser = false,
 }: EditProfileFormProps) {
-  const router = useRouter();
   const updateProfileMutation = useUpdateUserProfile();
 
   const [formData, setFormData] = useState(initialData);
@@ -130,7 +129,10 @@ export function EditProfileForm({
       name: formData.name.trim(),
       bio: formData.bio,
       location: formData.location,
-      experience: formData.title, // Map title to experience field
+      experience: JSON.stringify({
+        title: formData.title,
+        experiences: formData.experience,
+      }), // Store both title and experiences as JSON
       website: formData.website,
       github: formData.github,
       twitter: formData.twitter,
@@ -286,71 +288,121 @@ export function EditProfileForm({
               {/* Experience */}
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold">Work Experience</h3>
-                <div className="space-y-6">
-                  {formData.experience.map((exp, index) => (
-                    <div
-                      key={index}
-                      className="space-y-2 p-4 border rounded-lg"
-                    >
-                      <Input
-                        value={exp.title}
-                        onChange={(e) =>
-                          handleExperienceChange(index, "title", e.target.value)
-                        }
-                        placeholder="Job Title"
-                      />
-                      <Input
-                        value={exp.company}
-                        onChange={(e) =>
-                          handleExperienceChange(
-                            index,
-                            "company",
-                            e.target.value
-                          )
-                        }
-                        placeholder="Company"
-                      />
-                      <Input
-                        value={exp.duration}
-                        onChange={(e) =>
-                          handleExperienceChange(
-                            index,
-                            "duration",
-                            e.target.value
-                          )
-                        }
-                        placeholder="e.g., 2022 - Present"
-                      />
-                      <Textarea
-                        value={exp.description}
-                        onChange={(e) =>
-                          handleExperienceChange(
-                            index,
-                            "description",
-                            e.target.value
-                          )
-                        }
-                        placeholder="Description"
-                        rows={3}
-                      />
-                      <Button
-                        type="button"
-                        variant="destructive"
-                        size="sm"
-                        onClick={() => handleRemoveExperience(index)}
-                      >
-                        Remove
-                      </Button>
+
+                {/* Experience Timeline Display */}
+                {formData.experience.length > 0 && (
+                  <div className="space-y-6">
+                    <div className="relative">
+                      {/* Timeline line */}
+                      <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+
+                      {formData.experience.map((exp, index) => (
+                        <div key={index} className="relative pl-12 pb-6">
+                          {/* Timeline dot */}
+                          <div className="absolute left-2 top-2 w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-sm"></div>
+
+                          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                            <div className="flex justify-between items-start mb-2">
+                              <h4 className="font-semibold text-gray-900">
+                                {exp.title}
+                              </h4>
+                              <button
+                                type="button"
+                                onClick={() => handleRemoveExperience(index)}
+                                className="text-gray-400 hover:text-red-500 transition-colors"
+                              >
+                                <X className="w-4 h-4" />
+                              </button>
+                            </div>
+                            <p className="text-blue-600 text-sm mb-1">
+                              {exp.company}
+                            </p>
+                            <p className="text-gray-500 text-sm mb-2">
+                              {exp.duration}
+                            </p>
+                            <p className="text-gray-700 text-sm">
+                              {exp.description}
+                            </p>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
+                  </div>
+                )}
+
+                {/* Add Experience Form */}
+                <div className="space-y-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
+                  <h4 className="font-medium text-gray-900">
+                    Add New Experience
+                  </h4>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="new-exp-title">Job Title</Label>
+                      <Input
+                        id="new-exp-title"
+                        value={newExperience.title}
+                        onChange={(e) =>
+                          setNewExperience((prev) => ({
+                            ...prev,
+                            title: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g., Senior Frontend Developer"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label htmlFor="new-exp-company">Company</Label>
+                      <Input
+                        id="new-exp-company"
+                        value={newExperience.company}
+                        onChange={(e) =>
+                          setNewExperience((prev) => ({
+                            ...prev,
+                            company: e.target.value,
+                          }))
+                        }
+                        placeholder="e.g., TechCorp Inc."
+                      />
+                    </div>
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="new-exp-duration">Duration</Label>
+                    <Input
+                      id="new-exp-duration"
+                      value={newExperience.duration}
+                      onChange={(e) =>
+                        setNewExperience((prev) => ({
+                          ...prev,
+                          duration: e.target.value,
+                        }))
+                      }
+                      placeholder="e.g., 2022 - Present"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <Label htmlFor="new-exp-description">Description</Label>
+                    <Textarea
+                      id="new-exp-description"
+                      value={newExperience.description}
+                      onChange={(e) =>
+                        setNewExperience((prev) => ({
+                          ...prev,
+                          description: e.target.value,
+                        }))
+                      }
+                      placeholder="Describe your role and achievements"
+                      rows={3}
+                    />
+                  </div>
+                  <Button
+                    type="button"
+                    variant="outline"
+                    onClick={handleAddExperience}
+                    disabled={!newExperience.title || !newExperience.company}
+                  >
+                    <Plus className="w-4 h-4 mr-2" /> Add Experience
+                  </Button>
                 </div>
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleAddExperience}
-                >
-                  <Plus className="w-4 h-4 mr-2" /> Add Experience
-                </Button>
               </div>
 
               <div className="flex justify-end">

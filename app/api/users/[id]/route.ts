@@ -10,7 +10,7 @@ const userSchema = z.object({
   name: z.string().min(1, "Name is required").max(100),
   bio: z.string().max(500).optional(),
   location: z.string().max(100).optional(),
-  experience: z.string().max(100).optional(),
+  experience: z.string().max(2000).optional(), // Increased limit for JSON experience data
   website: z.string().url().optional(),
   github: z.string().optional(),
   twitter: z.string().optional(),

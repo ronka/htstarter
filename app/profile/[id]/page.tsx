@@ -38,6 +38,13 @@ interface User {
   userProjects?: Project[];
 }
 
+interface Experience {
+  title: string;
+  company: string;
+  duration: string;
+  description: string;
+}
+
 interface Project {
   id: number;
   title: string;
@@ -132,7 +139,27 @@ function ProfileClient({ id }: ProfileClientProps) {
                 <h1 className="text-2xl font-bold text-gray-900 mb-1">
                   {user.name}
                 </h1>
-                <p className="text-gray-600 mb-2">{user.experience}</p>
+                <p className="text-gray-600 mb-2">
+                  {(() => {
+                    try {
+                      if (user.experience) {
+                        const parsed = JSON.parse(user.experience);
+                        if (
+                          parsed &&
+                          typeof parsed === "object" &&
+                          !Array.isArray(parsed) &&
+                          parsed.title
+                        ) {
+                          return parsed.title;
+                        }
+                      }
+                    } catch (error) {
+                      // If parsing fails, show the raw experience text
+                      return user.experience;
+                    }
+                    return user.experience;
+                  })()}
+                </p>
                 <p className="text-sm text-gray-500 mb-4">{user.location}</p>
 
                 <div className="flex justify-center gap-4 mb-6">
@@ -140,45 +167,45 @@ function ProfileClient({ id }: ProfileClientProps) {
                     <div className="text-xl font-bold text-gray-900">
                       {user.projects}
                     </div>
-                    <div className="text-sm text-gray-500">פרויקטים</div>
+                    <div className="text-sm text-gray-500">Projects</div>
                   </div>
                   <div className="text-center">
                     <div className="text-xl font-bold text-gray-900">
                       {user.followers}
                     </div>
-                    <div className="text-sm text-gray-500">עוקבים</div>
+                    <div className="text-sm text-gray-500">Followers</div>
                   </div>
                   <div className="text-center">
                     <div className="text-xl font-bold text-gray-900">
                       {user.following}
                     </div>
-                    <div className="text-sm text-gray-500">עוקב אחרי</div>
+                    <div className="text-sm text-gray-500">Following</div>
                   </div>
                 </div>
 
                 <div className="flex justify-center gap-2 mb-4">
-                  <Button size="sm">עקוב</Button>
+                  <Button size="sm">Follow</Button>
                   <Button variant="outline" size="sm">
-                    שלח הודעה
+                    Send Message
                   </Button>
                 </div>
 
                 <div className="mb-6">
                   <Link href={`/profile/${user.id}/edit`}>
                     <Button variant="outline" size="sm" className="w-full">
-                      ערוך פרופיל
+                      Edit Profile
                     </Button>
                   </Link>
                 </div>
 
-                <p className="text-sm text-gray-600 text-right">{user.bio}</p>
+                <p className="text-sm text-gray-600">{user.bio}</p>
               </div>
             </Card>
 
             {/* Skills */}
             <Card className="p-6 mt-6">
               <h3 className="font-semibold text-lg mb-4">
-                כישורים וטכנולוגיות
+                Skills & Technologies
               </h3>
               <div className="flex flex-wrap gap-2">
                 {user.skills.map((skill, index) => (
@@ -191,12 +218,12 @@ function ProfileClient({ id }: ProfileClientProps) {
 
             {/* Contact Info */}
             <Card className="p-6 mt-6">
-              <h3 className="font-semibold text-lg mb-4 text-right">
-                יצירת קשר
+              <h3 className="font-semibold text-lg mb-4">
+                Contact Information
               </h3>
               <div className="space-y-3 text-sm">
                 <div className="flex items-center gap-2">
-                  <span className="font-medium flex-shrink-0">אתר:</span>
+                  <span className="font-medium flex-shrink-0">Website:</span>
                   <a
                     href={user.website}
                     className="text-blue-600 hover:underline truncate block"
@@ -208,7 +235,7 @@ function ProfileClient({ id }: ProfileClientProps) {
                   </a>
                 </div>
                 <div className="flex items-center gap-2">
-                  <span className="font-medium flex-shrink-0">טוויטר:</span>
+                  <span className="font-medium flex-shrink-0">Twitter:</span>
                   <span
                     className="text-gray-600 truncate block"
                     title={user.twitter}
@@ -232,18 +259,81 @@ function ProfileClient({ id }: ProfileClientProps) {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             <Card className="p-6">
-              <h2 className="text-xl font-bold mb-6">ניסיון מקצועי</h2>
+              <h2 className="text-xl font-bold mb-6">Experience</h2>
               <div className="space-y-6">
-                <div className="border-r-2 border-blue-200 pr-4">
-                  <h3 className="font-semibold text-lg">{user.experience}</h3>
-                  <p className="text-gray-600">Experience details</p>
-                </div>
+                {(() => {
+                  try {
+                    const parsedExperience = user.experience
+                      ? JSON.parse(user.experience)
+                      : null;
+                    let experienceData: Experience[] = [];
+                    let userTitle = "";
+
+                    if (parsedExperience) {
+                      if (Array.isArray(parsedExperience)) {
+                        // Old format - direct array
+                        experienceData = parsedExperience;
+                      } else if (parsedExperience.experiences) {
+                        // New format - object with title and experiences
+                        experienceData = parsedExperience.experiences;
+                        userTitle = parsedExperience.title || "";
+                      }
+                    }
+
+                    if (experienceData.length > 0) {
+                      return (
+                        <div className="relative">
+                          {/* Timeline line */}
+                          <div className="absolute right-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+
+                          {experienceData.map((exp, index) => (
+                            <div key={index} className="relative pr-12 pb-6">
+                              {/* Timeline dot */}
+                              <div className="absolute right-2 top-2 w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-sm"></div>
+
+                              <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
+                                <h4 className="font-semibold text-gray-900 mb-1">
+                                  {exp.title}
+                                </h4>
+                                <p className="text-blue-600 text-sm mb-1">
+                                  {exp.company}
+                                </p>
+                                <p className="text-gray-500 text-sm mb-2">
+                                  {exp.duration}
+                                </p>
+                                <p className="text-gray-700 text-sm">
+                                  {exp.description}
+                                </p>
+                              </div>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    } else {
+                      return (
+                        <div className="text-center py-8 text-gray-500">
+                          <p>No work experience added yet.</p>
+                        </div>
+                      );
+                    }
+                  } catch (error) {
+                    // Fallback to display experience as text if JSON parsing fails
+                    return (
+                      <div className="border-r-2 border-blue-200 pr-4">
+                        <h3 className="font-semibold text-lg">
+                          {user.experience}
+                        </h3>
+                        <p className="text-gray-600">Experience details</p>
+                      </div>
+                    );
+                  }
+                })()}
               </div>
             </Card>
 
             {/* Projects */}
             <Card className="p-6">
-              <h2 className="text-xl font-bold mb-6">הפרויקטים שלי</h2>
+              <h2 className="text-xl font-bold mb-6">My Projects</h2>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                 {user.userProjects && user.userProjects.length > 0 ? (
                   user.userProjects.map((project) => (
@@ -263,7 +353,7 @@ function ProfileClient({ id }: ProfileClientProps) {
                       <p className="text-gray-600 text-sm mb-3">
                         {project.description}
                       </p>
-                      <div className="flex flex-wrap gap-1 mb-3 flex-row-reverse">
+                      <div className="flex flex-wrap gap-1 mb-3">
                         {project.technologies.slice(0, 3).map((tech) => (
                           <Badge
                             key={tech}
@@ -287,8 +377,8 @@ function ProfileClient({ id }: ProfileClientProps) {
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              <ExternalLink className="w-3 h-3 ml-1" />
-                              צפה
+                              <ExternalLink className="w-3 h-3 mr-1" />
+                              View
                             </a>
                           </Button>
                         )}
@@ -299,8 +389,8 @@ function ProfileClient({ id }: ProfileClientProps) {
                               target="_blank"
                               rel="noopener noreferrer"
                             >
-                              <Github className="w-3 h-3 ml-1" />
-                              קוד
+                              <Github className="w-3 h-3 mr-1" />
+                              Code
                             </a>
                           </Button>
                         )}
