@@ -26,10 +26,11 @@ const updateProjectSchema = z.object({
 // GET /api/projects/[id]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = parseInt(params.id);
+    const { id } = await params;
+    const projectId = parseInt(id);
 
     if (isNaN(projectId)) {
       return NextResponse.json(
@@ -106,11 +107,12 @@ export async function GET(
 // PUT /api/projects/[id]
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
-    const projectId = parseInt(params.id);
+    const { id } = await params;
+    const projectId = parseInt(id);
     const body = await request.json();
 
     if (isNaN(projectId)) {
@@ -177,11 +179,12 @@ export async function PUT(
 // DELETE /api/projects/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
-    const projectId = parseInt(params.id);
+    const { id } = await params;
+    const projectId = parseInt(id);
 
     if (isNaN(projectId)) {
       return NextResponse.json(
@@ -215,10 +218,18 @@ export async function DELETE(
     await db.delete(projects).where(eq(projects.id, projectId));
 
     // Update user's project count
-    await db
-      .update(users)
-      .set({ projects: user.projects - 1 })
-      .where(eq(users.id, user.id));
+    const [userData] = await db
+      .select({ projects: users.projects })
+      .from(users)
+      .where(eq(users.id, existingProject.authorId))
+      .limit(1);
+
+    if (userData) {
+      await db
+        .update(users)
+        .set({ projects: Math.max(0, userData.projects - 1) })
+        .where(eq(users.id, existingProject.authorId));
+    }
 
     return NextResponse.json({
       success: true,

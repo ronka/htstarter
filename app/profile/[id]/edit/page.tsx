@@ -69,8 +69,8 @@ export default function EditProfilePage() {
             role="alert"
           >
             <span className="block sm:inline">
-              Welcome! Let's create your profile. Fill in the details below to
-              get started.
+              Welcome! Let&apos;s create your profile. Fill in the details below
+              to get started.
             </span>
           </div>
           <EditProfileForm

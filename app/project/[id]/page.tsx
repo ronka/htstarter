@@ -1,6 +1,5 @@
 "use client";
 
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -10,107 +9,34 @@ import { Separator } from "@/components/ui/separator";
 import { Heart, ExternalLink, Github, ArrowLeft, Loader2 } from "lucide-react";
 import Header from "@/components/Header";
 import { useParams } from "next/navigation";
-import { toast } from "sonner";
-
-interface Project {
-  id: number;
-  title: string;
-  description: string;
-  image: string;
-  author: {
-    id: string;
-    name: string;
-    avatar: string;
-  };
-  technologies: string[];
-  votes: number;
-  comments: number;
-  createdAt: string;
-  liveUrl?: string;
-  githubUrl?: string;
-  features?: string[];
-  techDetails?: string;
-  challenges?: string;
-  category?: {
-    name: string;
-    slug: string;
-  };
-}
+import { useProject } from "@/hooks/use-project";
+import { useVote } from "@/hooks/use-vote";
+import { useState } from "react";
 
 interface ProjectDetailClientProps {
   id: string;
 }
 
 function ProjectDetailClient({ id }: ProjectDetailClientProps) {
-  const [project, setProject] = useState<Project | null>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
   const [voted, setVoted] = useState(false);
-  const [voteCount, setVoteCount] = useState(0);
-
-  useEffect(() => {
-    const fetchProject = async () => {
-      try {
-        const response = await fetch(`/api/projects/${id}`);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch project");
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-          setProject(data.data);
-          setVoteCount(data.data.votes);
-        } else {
-          throw new Error(data.error || "Failed to fetch project");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-        toast.error("Failed to load project");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProject();
-  }, [id]);
+  const { data: project, isLoading, error } = useProject(id);
+  const { addVote, removeVote, isAddingVote, isRemovingVote } = useVote();
 
   const handleVote = async () => {
     if (!project) return;
 
-    try {
-      if (voted) {
-        // Remove vote
-        const response = await fetch(`/api/projects/${project.id}/vote`, {
-          method: "DELETE",
-        });
+    if (isAddingVote || isRemovingVote) return;
 
-        if (response.ok) {
-          setVoteCount((prev) => prev - 1);
-          setVoted(false);
-        } else {
-          toast.error("Failed to remove vote");
-        }
-      } else {
-        // Add vote
-        const response = await fetch(`/api/projects/${project.id}/vote`, {
-          method: "POST",
-        });
-
-        if (response.ok) {
-          setVoteCount((prev) => prev + 1);
-          setVoted(true);
-        } else {
-          toast.error("Failed to add vote");
-        }
-      }
-    } catch (error) {
-      toast.error("An error occurred while voting");
+    if (voted) {
+      removeVote(project.id);
+      setVoted(false);
+    } else {
+      addVote(project.id);
+      setVoted(true);
     }
   };
 
-  if (loading) {
+  if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <Header />
@@ -128,7 +54,7 @@ function ProjectDetailClient({ id }: ProjectDetailClientProps) {
         <Header />
         <div className="max-w-4xl mx-auto px-4 py-12 text-center">
           <h1 className="text-2xl font-bold mb-4">הפרויקט לא נמצא</h1>
-          <p className="text-gray-600 mb-4">{error}</p>
+          <p className="text-gray-600 mb-4">{error?.message}</p>
           <Link href="/">
             <Button>חזרה לעמוד הבית</Button>
           </Link>
@@ -168,11 +94,18 @@ function ProjectDetailClient({ id }: ProjectDetailClientProps) {
                         : "bg-white hover:bg-gray-100"
                     } text-gray-900`}
                     onClick={handleVote}
+                    disabled={isAddingVote || isRemovingVote}
                   >
-                    <Heart
-                      className={`w-4 h-4 ml-1 ${voted ? "fill-current" : ""}`}
-                    />
-                    {voteCount}
+                    {isAddingVote || isRemovingVote ? (
+                      <Loader2 className="w-4 h-4 animate-spin ml-1" />
+                    ) : (
+                      <Heart
+                        className={`w-4 h-4 ml-1 ${
+                          voted ? "fill-current" : ""
+                        }`}
+                      />
+                    )}
+                    {project.votes}
                   </Button>
                 </div>
               </div>

@@ -13,10 +13,11 @@ const createCommentSchema = z.object({
 // GET /api/projects/[id]/comments
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const projectId = parseInt(params.id);
+    const { id } = await params;
+    const projectId = parseInt(id);
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
@@ -94,11 +95,12 @@ export async function GET(
 // POST /api/projects/[id]/comments
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
-    const projectId = parseInt(params.id);
+    const { id } = await params;
+    const projectId = parseInt(id);
     const body = await request.json();
 
     if (isNaN(projectId)) {

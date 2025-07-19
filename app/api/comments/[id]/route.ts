@@ -7,11 +7,12 @@ import { requireAuth, isAuthorized } from "../../../../lib/auth";
 // DELETE /api/comments/[id]
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
-    const commentId = parseInt(params.id);
+    const { id } = await params;
+    const commentId = parseInt(id);
 
     if (isNaN(commentId)) {
       return NextResponse.json(

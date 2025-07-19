@@ -20,10 +20,10 @@ const userSchema = z.object({
 // GET /api/users/[id]
 export async function GET(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
-    const userId = params.id;
+    const { id: userId } = await params;
 
     // Get user with their projects
     const userData = await db
@@ -91,11 +91,11 @@ export async function GET(
 // POST /api/users/[id] - Create a new user
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const clerkUser = await requireAuth();
-    const userId = params.id;
+    const { id: userId } = await params;
     const body = await request.json();
 
     if (!isAuthorized(clerkUser.id, userId)) {
@@ -165,11 +165,11 @@ export async function POST(
 // PUT /api/users/[id] - Update existing user or create if doesn't exist
 export async function PUT(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const clerkUser = await requireAuth();
-    const userId = params.id;
+    const { id: userId } = await params;
     const body = await request.json();
 
     if (!isAuthorized(clerkUser.id, userId)) {

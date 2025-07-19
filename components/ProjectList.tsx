@@ -1,8 +1,9 @@
-import { useState, useEffect } from "react";
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Heart, MessageCircle, GitFork, Loader2 } from "lucide-react";
-import { toast } from "sonner";
+import { useProjects } from "@/hooks/use-projects";
+import { useVote } from "@/hooks/use-vote";
+import { useState } from "react";
 
 interface Project {
   id: number;
@@ -30,47 +31,20 @@ interface ProjectListProps {
 
 const ProjectListItem = ({ project }: { project: Project }) => {
   const [voted, setVoted] = useState(false);
-  const [voteCount, setVoteCount] = useState(project.votes);
-  const [isVoting, setIsVoting] = useState(false);
+  const { addVote, removeVote, isAddingVote, isRemovingVote } = useVote();
 
   const handleVote = async (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
 
-    if (isVoting) return;
+    if (isAddingVote || isRemovingVote) return;
 
-    setIsVoting(true);
-
-    try {
-      if (voted) {
-        // Remove vote
-        const response = await fetch(`/api/projects/${project.id}/vote`, {
-          method: "DELETE",
-        });
-
-        if (response.ok) {
-          setVoteCount((prev) => prev - 1);
-          setVoted(false);
-        } else {
-          toast.error("Failed to remove vote");
-        }
-      } else {
-        // Add vote
-        const response = await fetch(`/api/projects/${project.id}/vote`, {
-          method: "POST",
-        });
-
-        if (response.ok) {
-          setVoteCount((prev) => prev + 1);
-          setVoted(true);
-        } else {
-          toast.error("Failed to add vote");
-        }
-      }
-    } catch (error) {
-      toast.error("An error occurred while voting");
-    } finally {
-      setIsVoting(false);
+    if (voted) {
+      removeVote(project.id);
+      setVoted(false);
+    } else {
+      addVote(project.id);
+      setVoted(true);
     }
   };
 
@@ -86,9 +60,14 @@ const ProjectListItem = ({ project }: { project: Project }) => {
             variant="ghost"
             size="sm"
             onClick={handleVote}
+            disabled={isAddingVote || isRemovingVote}
             className="mt-2 text-xs text-blue-600 hover:text-blue-700"
           >
-            Vibe it
+            {isAddingVote || isRemovingVote ? (
+              <Loader2 className="w-3 h-3 animate-spin" />
+            ) : (
+              "Vibe it"
+            )}
           </Button>
         </div>
 
@@ -136,7 +115,7 @@ const ProjectListItem = ({ project }: { project: Project }) => {
                   voted ? "fill-current text-red-500" : ""
                 }`}
               />
-              <span>{voteCount}</span>
+              <span>{project.votes}</span>
             </div>
             <div className="flex items-center gap-1">
               <GitFork className="w-4 h-4" />
@@ -154,45 +133,14 @@ const ProjectList = ({
   category,
   search,
 }: ProjectListProps) => {
-  const [projects, setProjects] = useState<Project[]>(initialProjects || []);
-  const [loading, setLoading] = useState(!initialProjects);
-  const [error, setError] = useState<string | null>(null);
+  const { data, isLoading, error } = useProjects({
+    category,
+    search,
+  });
 
-  useEffect(() => {
-    const fetchProjects = async () => {
-      setLoading(true);
-      setError(null);
+  const projects = data?.data || initialProjects || [];
 
-      try {
-        const params = new URLSearchParams();
-        if (category) params.append("category", category);
-        if (search) params.append("search", search);
-
-        const response = await fetch(`/api/projects?${params.toString()}`);
-
-        if (!response.ok) {
-          throw new Error("Failed to fetch projects");
-        }
-
-        const data = await response.json();
-
-        if (data.success) {
-          setProjects(data.data);
-        } else {
-          throw new Error(data.error || "Failed to fetch projects");
-        }
-      } catch (err) {
-        setError(err instanceof Error ? err.message : "An error occurred");
-        toast.error("Failed to load projects");
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchProjects();
-  }, [category, search]);
-
-  if (loading) {
+  if (isLoading && !initialProjects) {
     return (
       <div className="space-y-4">
         {[...Array(3)].map((_, i) => (
@@ -221,7 +169,7 @@ const ProjectList = ({
         <h3 className="text-xl font-semibold text-gray-600 mb-2">
           Error loading projects
         </h3>
-        <p className="text-gray-500">{error}</p>
+        <p className="text-gray-500">{error.message}</p>
       </div>
     );
   }

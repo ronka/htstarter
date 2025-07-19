@@ -7,11 +7,12 @@ import { requireAuth } from "../../../../../lib/auth";
 // POST /api/projects/[id]/vote
 export async function POST(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
-    const projectId = parseInt(params.id);
+    const { id } = await params;
+    const projectId = parseInt(id);
 
     if (isNaN(projectId)) {
       return NextResponse.json(
@@ -76,11 +77,12 @@ export async function POST(
 // DELETE /api/projects/[id]/vote
 export async function DELETE(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
     const user = await requireAuth();
-    const projectId = parseInt(params.id);
+    const { id } = await params;
+    const projectId = parseInt(id);
 
     if (isNaN(projectId)) {
       return NextResponse.json(
