@@ -11,7 +11,7 @@ interface ProjectsSectionProps {
 const ProjectsSection = ({ projects }: ProjectsSectionProps) => {
   return (
     <Card className="p-6">
-      <h2 className="text-xl font-bold mb-6">My Projects</h2>
+      <h2 className="text-xl font-bold mb-6">הפרויקטים שלי</h2>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {projects && projects.length > 0 ? (
           projects.map((project) => (
@@ -50,7 +50,7 @@ const ProjectsSection = ({ projects }: ProjectsSectionProps) => {
                       rel="noopener noreferrer"
                     >
                       <ExternalLink className="w-3 h-3 mr-1" />
-                      View
+                      צפה
                     </a>
                   </Button>
                 )}
@@ -62,7 +62,7 @@ const ProjectsSection = ({ projects }: ProjectsSectionProps) => {
                       rel="noopener noreferrer"
                     >
                       <Github className="w-3 h-3 mr-1" />
-                      Code
+                      קוד
                     </a>
                   </Button>
                 )}
@@ -71,7 +71,7 @@ const ProjectsSection = ({ projects }: ProjectsSectionProps) => {
           ))
         ) : (
           <div className="col-span-2 text-center py-8">
-            <p className="text-gray-500">No projects yet</p>
+            <p className="text-gray-500">אין פרויקטים עדיין</p>
           </div>
         )}
       </div>

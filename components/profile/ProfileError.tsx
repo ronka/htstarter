@@ -8,13 +8,13 @@ interface ProfileErrorProps {
 
 const ProfileError = ({ error }: ProfileErrorProps) => {
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir="rtl">
       <Header />
       <div className="max-w-6xl mx-auto px-4 py-12 text-center">
-        <h1 className="text-2xl font-bold mb-4">User not found</h1>
+        <h1 className="text-2xl font-bold mb-4">משתמש לא נמצא</h1>
         <p className="text-gray-600 mb-4">{error}</p>
         <Link href="/">
-          <Button>Back to Home</Button>
+          <Button>חזור לדף הבית</Button>
         </Link>
       </div>
     </div>

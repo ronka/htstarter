@@ -22,11 +22,11 @@ export default function ProfilePage() {
   }
 
   if (error || !user) {
-    return <ProfileError error={error?.message || "User not found"} />;
+    return <ProfileError error={error?.message || "משתמש לא נמצא"} />;
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir="rtl">
       <Header />
 
       <div className="max-w-6xl mx-auto px-4 py-8">
