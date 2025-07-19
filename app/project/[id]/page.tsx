@@ -165,7 +165,7 @@ function ProjectDetailClient({ id }: ProjectDetailClientProps) {
                             key={index}
                             className="flex items-center text-gray-700"
                           >
-                            <div className="w-2 h-2 bg-blue-500 rounded-full mr-3" />
+                            <div className="w-2 h-2 bg-blue-500 rounded-full ml-3" />
                             {feature}
                           </li>
                         ))}

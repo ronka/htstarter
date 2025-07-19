@@ -96,7 +96,7 @@ const ProjectListItem = ({ project }: { project: Project }) => {
               href={`/profile/${project.author.id}`}
               className="hover:text-gray-700 transition-colors"
             >
-              by {project.author.name}
+              {project.author.name}
             </Link>
             <span>
               {new Date(project.createdAt).toLocaleDateString("he-IL", {
@@ -119,7 +119,7 @@ const ProjectListItem = ({ project }: { project: Project }) => {
             </div>
             <div className="flex items-center gap-1">
               <GitFork className="w-4 h-4" />
-              <span>Repo</span>
+              <span>GitHub</span>
             </div>
           </div>
         </div>
@@ -191,14 +191,6 @@ const ProjectList = ({
           </p>
         </div>
       )}
-
-      <div className="text-center py-8">
-        <Link href="/submit">
-          <Button variant="outline" className="text-gray-600">
-            Submit your vibe app
-          </Button>
-        </Link>
-      </div>
     </div>
   );
 };

@@ -180,7 +180,7 @@ function ProfileClient({ id }: ProfileClientProps) {
               <h3 className="font-semibold text-lg mb-4">
                 כישורים וטכנולוגיות
               </h3>
-              <div className="flex flex-wrap gap-2 flex-row-reverse">
+              <div className="flex flex-wrap gap-2">
                 {user.skills.map((skill, index) => (
                   <Badge key={index} variant="secondary" className="text-xs">
                     {skill}
@@ -191,26 +191,39 @@ function ProfileClient({ id }: ProfileClientProps) {
 
             {/* Contact Info */}
             <Card className="p-6 mt-6">
-              <h3 className="font-semibold text-lg mb-4">יצירת קשר</h3>
-              <div className="space-y-2 text-sm">
-                <div className="flex items-center gap-2 flex-row-reverse">
-                  <span className="font-medium">:אתר</span>
+              <h3 className="font-semibold text-lg mb-4 text-right">
+                יצירת קשר
+              </h3>
+              <div className="space-y-3 text-sm">
+                <div className="flex items-center gap-2">
+                  <span className="font-medium flex-shrink-0">אתר:</span>
                   <a
                     href={user.website}
-                    className="text-blue-600 hover:underline"
+                    className="text-blue-600 hover:underline truncate block"
                     target="_blank"
                     rel="noopener noreferrer"
+                    title={user.website}
                   >
                     {user.website}
                   </a>
                 </div>
-                <div className="flex items-center gap-2 flex-row-reverse">
-                  <span className="font-medium">:טוויטר</span>
-                  <span className="text-gray-600">{user.twitter}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium flex-shrink-0">טוויטר:</span>
+                  <span
+                    className="text-gray-600 truncate block"
+                    title={user.twitter}
+                  >
+                    {user.twitter}
+                  </span>
                 </div>
-                <div className="flex items-center gap-2 flex-row-reverse">
-                  <span className="font-medium">:GitHub</span>
-                  <span className="text-gray-600">{user.github}</span>
+                <div className="flex items-center gap-2">
+                  <span className="font-medium flex-shrink-0">GitHub:</span>
+                  <span
+                    className="text-gray-600 truncate block"
+                    title={user.github}
+                  >
+                    {user.github}
+                  </span>
                 </div>
               </div>
             </Card>

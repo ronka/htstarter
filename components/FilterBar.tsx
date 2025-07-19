@@ -102,7 +102,7 @@ const FilterBar = ({
           </div>
         </div>
 
-        <div className="flex flex-wrap gap-2 mt-4 justify-end">
+        <div className="flex flex-wrap gap-2 mt-4">
           {categories.map((category) => (
             <Button
               key={category.name}
