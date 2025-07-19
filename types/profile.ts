@@ -9,7 +9,6 @@ export interface User {
   github?: string;
   twitter?: string;
   skills?: string[];
-  projects?: any[];
   followers?: number;
   following?: number;
   createdAt: string;
@@ -28,10 +27,23 @@ export interface Project {
   title: string;
   description: string;
   image: string;
+  author: {
+    id: string;
+    name: string;
+    avatar: string;
+  };
   technologies: string[];
   votes: number;
   comments: number;
   createdAt: string;
   liveUrl?: string;
   githubUrl?: string;
+  features?: string[];
+  techDetails?: string;
+  challenges?: string;
+  category?: {
+    id: number;
+    name: string;
+    slug: string;
+  };
 }

@@ -3,6 +3,7 @@
 import { useParams } from "next/navigation";
 import Header from "@/components/Header";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import { useUserProjects } from "@/hooks/use-user-projects";
 import ProfileInfo from "@/components/profile/ProfileInfo";
 import SkillsSection from "@/components/profile/SkillsSection";
 import ContactInfo from "@/components/profile/ContactInfo";
@@ -15,14 +16,23 @@ export default function ProfilePage() {
   const params = useParams();
   const id = params?.id as string;
 
-  const { data: user, isLoading, error } = useUserProfile(id);
+  const {
+    data: user,
+    isLoading: userLoading,
+    error: userError,
+  } = useUserProfile(id);
+  const {
+    data: userProjects,
+    isLoading: projectsLoading,
+    error: projectsError,
+  } = useUserProjects(id);
 
-  if (isLoading) {
+  if (userLoading || projectsLoading) {
     return <ProfileLoading />;
   }
 
-  if (error || !user) {
-    return <ProfileError error={error?.message || "משתמש לא נמצא"} />;
+  if (userError || !user) {
+    return <ProfileError error={userError?.message || "משתמש לא נמצא"} />;
   }
 
   return (
@@ -45,7 +55,7 @@ export default function ProfilePage() {
           {/* Main Content */}
           <div className="lg:col-span-2 space-y-8">
             <ExperienceSection experience={user.experience || ""} />
-            <ProjectsSection projects={user.projects || []} />
+            <ProjectsSection projects={userProjects?.data || []} />
           </div>
         </div>
       </div>

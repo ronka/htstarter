@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
     const limit = parseInt(searchParams.get("limit") || "10");
     const category = searchParams.get("category");
     const search = searchParams.get("search");
+    const authorId = searchParams.get("authorId");
     const sortBy = searchParams.get("sortBy") || "createdAt";
     const sortOrder = searchParams.get("sortOrder") || "desc";
 
@@ -39,6 +40,9 @@ export async function GET(request: NextRequest) {
     }
     if (search) {
       whereConditions.push(like(projects.title, `%${search}%`));
+    }
+    if (authorId) {
+      whereConditions.push(eq(projects.authorId, authorId));
     }
 
     // Build order by
