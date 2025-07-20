@@ -225,13 +225,15 @@ const ProjectList = ({
 
   return (
     <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-1">פרויקטי היום</h2>
-        <p className="text-gray-600">{today}</p>
-      </div>
+      <div className="flex items-center justify-between">
+        <div className="text-right">
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">
+            פרויקטי היום
+          </h2>
+          <p className="text-gray-600">{today}</p>
+        </div>
 
-      {/* Sort Controls */}
-      <div className="flex justify-end">
+        {/* Sort Controls */}
         <DropdownMenu>
           <DropdownMenuTrigger asChild>
             <Button variant="outline" className="gap-2" disabled={isLoading}>
