@@ -39,37 +39,31 @@ const ProjectForm = ({
   initialData,
 }: ProjectFormProps) => {
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    image: "",
-    liveUrl: "",
-    githubUrl: "",
-    technologies: "",
-    category: "lovable",
-    features: "",
-    techDetails: "",
-    challenges: "",
+    title: initialData.title || "",
+    description: initialData.description || "",
+    image: initialData.image || "",
+    liveUrl: initialData.liveUrl || "",
+    githubUrl: initialData.githubUrl || "",
+    technologies: initialData.technologies?.join(", ") || "",
+    category: initialData.category || "lovable",
+    features: initialData.features?.join(", ") || "",
+    techDetails: initialData.techDetails || "",
+    challenges: initialData.challenges || "",
   });
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Initialize form with existing data if editing
-  useEffect(() => {
-    if (mode === "edit" && initialData) {
-      setFormData({
-        title: initialData.title || "",
-        description: initialData.description || "",
-        image: initialData.image || "",
-        liveUrl: initialData.liveUrl || "",
-        githubUrl: initialData.githubUrl || "",
-        technologies: initialData.technologies?.join(", ") || "",
-        category: initialData.category || "lovable",
-        features: initialData.features?.join(", ") || "",
-        techDetails: initialData.techDetails || "",
-        challenges: initialData.challenges || "",
-      });
-    }
-  }, [mode, initialData]);
+  const initialImage = initialData?.image
+    ? [
+        {
+          url: initialData.image,
+          filename: "existing-image",
+          size: 0,
+        },
+      ]
+    : [];
+
+  const [uploadedImages, setUploadedImages] =
+    useState<UploadedImage[]>(initialImage);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   const handleImageUpload = (images: UploadedImage[]) => {
     setUploadedImages(images);
@@ -148,8 +142,6 @@ const ProjectForm = ({
             : "Project submitted successfully!"
         );
         onClose();
-        // Optionally refresh the page or update the project list
-        window.location.reload();
       } else {
         const errorMessage =
           data.error || data.details || `Failed to ${mode} project`;
@@ -245,17 +237,7 @@ const ProjectForm = ({
                 onUpload={handleImageUpload}
                 maxFiles={1}
                 maxSize={5}
-                initialImages={
-                  mode === "edit" && initialData?.image
-                    ? [
-                        {
-                          url: initialData.image,
-                          filename: "existing-image",
-                          size: 0,
-                        },
-                      ]
-                    : []
-                }
+                initialImages={mode === "edit" && initialImage}
               />
             </div>
 

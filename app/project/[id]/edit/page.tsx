@@ -7,16 +7,18 @@ import { useProject } from "@/hooks/use-project";
 import ProjectForm from "@/components/ProjectForm";
 
 export default function EditProjectPage() {
-  const { userId } = useAuth();
+  const { userId, isLoaded } = useAuth();
   const params = useParams();
   const router = useRouter();
   const projectId = params.id as string;
-  const [showForm, setShowForm] = useState(false);
+  const [showForm, setShowForm] = useState(true);
 
   const { data: project, isLoading, error } = useProject(projectId);
 
   // Handle authentication and authorization using useEffect
   useEffect(() => {
+    if (!isLoaded) return;
+
     if (!userId) {
       router.replace("/sign-in");
       return;
@@ -26,15 +28,18 @@ export default function EditProjectPage() {
       router.replace("/");
       return;
     }
-  }, [userId, project, router]);
+  }, [userId, project, router, isLoaded]);
 
   // Show loading state
   if (isLoading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className="min-h-screen bg-gray-50 flex items-center justify-center"
+        dir="rtl"
+      >
         <div className="text-center">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-gray-900 mx-auto"></div>
-          <p className="mt-2 text-gray-600">Loading project...</p>
+          <p className="mt-2 text-gray-600">טוען פרויקט...</p>
         </div>
       </div>
     );
@@ -43,26 +48,24 @@ export default function EditProjectPage() {
   // Handle error states
   if (error || !project) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+      <div
+        className="min-h-screen bg-gray-50 flex items-center justify-center"
+        dir="rtl"
+      >
         <div className="text-center">
-          <p className="text-red-600 mb-4">Failed to load project</p>
+          <p className="text-red-600 mb-4">שגיאה בטעינת הפרויקט</p>
           <p className="text-gray-600 mb-4">
-            {error instanceof Error ? error.message : "Project not found"}
+            {error instanceof Error ? error.message : "הפרויקט לא נמצא"}
           </p>
           <button
             onClick={() => router.back()}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
-            Go Back
+            חזור
           </button>
         </div>
       </div>
     );
-  }
-
-  // Show form when project is loaded and user is authorized
-  if (!showForm) {
-    setShowForm(true);
   }
 
   const handleCloseForm = () => {
@@ -83,7 +86,7 @@ export default function EditProjectPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50" dir="rtl">
       {showForm && (
         <ProjectForm
           onClose={handleCloseForm}
