@@ -13,7 +13,7 @@ const createProjectSchema = z.object({
   technologies: z.array(z.string()).optional(),
   categoryId: z.number().optional(),
   liveUrl: z.string().url().optional(),
-  githubUrl: z.string().url().optional(),
+  githubUrl: z.string().optional(),
   features: z.array(z.string()).optional(),
   techDetails: z.string().optional(),
   challenges: z.string().optional(),

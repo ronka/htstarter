@@ -288,13 +288,14 @@ export default function SubmitPage() {
 
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="image">קישור לתמונת הפרויקט</Label>
+                      <Label htmlFor="image">קישור לתמונת הפרויקט *</Label>
                       <Input
                         id="image"
                         type="url"
                         value={formData.image}
                         onChange={(e) => handleImageUrlChange(e.target.value)}
                         placeholder="https://example.com/image.jpg"
+                        required
                       />
                       {imagePreview && (
                         <div className="mt-2">

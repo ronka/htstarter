@@ -210,7 +210,7 @@ const ProjectForm = ({
             </div>
 
             <div>
-              <Label htmlFor="image">קישור לתמונת הפרויקט</Label>
+              <Label htmlFor="image">קישור לתמונת הפרויקט *</Label>
               <Input
                 id="image"
                 name="image"
@@ -218,6 +218,7 @@ const ProjectForm = ({
                 onChange={handleChange}
                 placeholder="https://example.com/image.png"
                 type="url"
+                required
               />
             </div>
 
