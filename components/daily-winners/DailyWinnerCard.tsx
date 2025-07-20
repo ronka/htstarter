@@ -1,0 +1,97 @@
+"use client";
+
+import Image from "next/image";
+import Link from "next/link";
+import { format } from "date-fns";
+import { Badge } from "@/components/ui/badge";
+import { Card, CardContent, CardHeader } from "@/components/ui/card";
+import type { DailyWinnerWithProject } from "@/types/database";
+
+interface DailyWinnerCardProps {
+  winner: DailyWinnerWithProject;
+}
+
+export const DailyWinnerCard = ({ winner }: DailyWinnerCardProps) => {
+  const { project, winDate, voteCount } = winner;
+  const { title, description, image, author, category } = project;
+
+  const handleCardClick = () => {
+    // Navigation will be handled by the Link wrapper
+  };
+
+  const handleKeyDown = (event: React.KeyboardEvent) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      handleCardClick();
+    }
+  };
+
+  return (
+    <Link href={`/project/${project.id}`} className="block">
+      <Card
+        className="h-full cursor-pointer transition-all duration-200 hover:shadow-lg hover:scale-[1.02] focus:outline-none focus:ring-2 focus:ring-blue-500"
+        tabIndex={0}
+        onClick={handleCardClick}
+        onKeyDown={handleKeyDown}
+        aria-label={`View project: ${title}`}
+      >
+        <CardHeader className="p-0">
+          <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
+            {image ? (
+              <Image
+                src={image}
+                alt={title}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
+              />
+            ) : (
+              <div className="flex h-full w-full items-center justify-center bg-gray-200">
+                <span className="text-gray-500">No image</span>
+              </div>
+            )}
+            <div className="absolute top-3 right-3">
+              <Badge variant="secondary" className="bg-white/90 text-gray-800">
+                {voteCount} votes
+              </Badge>
+            </div>
+          </div>
+        </CardHeader>
+
+        <CardContent className="p-6">
+          <div className="mb-3">
+            <h3 className="text-xl font-semibold text-gray-900 mb-2 overflow-hidden text-ellipsis whitespace-nowrap">
+              {title}
+            </h3>
+            <p
+              className="text-gray-600 text-sm mb-3 overflow-hidden text-ellipsis"
+              style={{
+                display: "-webkit-box",
+                WebkitLineClamp: 3,
+                WebkitBoxOrient: "vertical",
+              }}
+            >
+              {description}
+            </p>
+          </div>
+
+          <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
+            <span>by {author.name}</span>
+            {category && (
+              <Badge variant="outline" className="text-xs">
+                {category.name}
+              </Badge>
+            )}
+          </div>
+
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-gray-600">
+              Won on {format(new Date(winDate), "MMM d, yyyy")}
+            </span>
+            <span className="font-medium text-green-600">Daily Winner</span>
+          </div>
+        </CardContent>
+      </Card>
+    </Link>
+  );
+};
