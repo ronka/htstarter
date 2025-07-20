@@ -19,7 +19,7 @@ const nextConfig = {
   reactStrictMode: true,
   // Optimize images
   images: {
-    domains: [],
+    domains: ["images.unsplash.com"],
   },
   // Configure environment variables
   env: {

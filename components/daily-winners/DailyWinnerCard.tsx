@@ -3,6 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import { format } from "date-fns";
+import { he } from "date-fns/locale";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import type { DailyWinnerWithProject } from "@/types/database";
@@ -33,7 +34,8 @@ export const DailyWinnerCard = ({ winner }: DailyWinnerCardProps) => {
         tabIndex={0}
         onClick={handleCardClick}
         onKeyDown={handleKeyDown}
-        aria-label={`View project: ${title}`}
+        aria-label={`צפה בפרויקט: ${title}`}
+        dir="rtl"
       >
         <CardHeader className="p-0">
           <div className="relative h-48 w-full overflow-hidden rounded-t-lg">
@@ -47,12 +49,12 @@ export const DailyWinnerCard = ({ winner }: DailyWinnerCardProps) => {
               />
             ) : (
               <div className="flex h-full w-full items-center justify-center bg-gray-200">
-                <span className="text-gray-500">No image</span>
+                <span className="text-gray-500">אין תמונה</span>
               </div>
             )}
-            <div className="absolute top-3 right-3">
+            <div className="absolute top-3 left-3">
               <Badge variant="secondary" className="bg-white/90 text-gray-800">
-                {voteCount} votes
+                {voteCount} קולות
               </Badge>
             </div>
           </div>
@@ -76,7 +78,7 @@ export const DailyWinnerCard = ({ winner }: DailyWinnerCardProps) => {
           </div>
 
           <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
-            <span>by {author.name}</span>
+            <span>מאת {author.name}</span>
             {category && (
               <Badge variant="outline" className="text-xs">
                 {category.name}
@@ -86,9 +88,9 @@ export const DailyWinnerCard = ({ winner }: DailyWinnerCardProps) => {
 
           <div className="flex items-center justify-between text-sm">
             <span className="text-gray-600">
-              Won on {format(new Date(winDate), "MMM d, yyyy")}
+              זכה ב-{format(new Date(winDate), "d MMM yyyy", { locale: he })}
             </span>
-            <span className="font-medium text-green-600">Daily Winner</span>
+            <span className="font-medium text-green-600">מנצח היום</span>
           </div>
         </CardContent>
       </Card>
