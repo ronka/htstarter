@@ -27,14 +27,14 @@
   - [x] 1.4 Update types/database.ts with DailyWinner interface
   - [x] 1.5 Create migration file for the new table
   - [x] 1.6 Run migration to create the table in the database
-- [ ] 2.0 API Route Implementation
-  - [ ] 2.1 Create app/api/daily-winners/route.ts file
-  - [ ] 2.2 Implement GET handler to fetch all daily winners
-  - [ ] 2.3 Add query to join with projects table to get project details
-  - [ ] 2.4 Implement sorting by win_date (most recent first)
-  - [ ] 2.5 Add error handling for database query failures
-  - [ ] 2.6 Add proper TypeScript types for API response
-  - [ ] 2.7 Test API endpoint with sample data
+- [x] 2.0 API Route Implementation
+  - [x] 2.1 Create app/api/daily-winners/route.ts file
+  - [x] 2.2 Implement GET handler to fetch all daily winners
+  - [x] 2.3 Add query to join with projects table to get project details
+  - [x] 2.4 Implement sorting by win_date (most recent first)
+  - [x] 2.5 Add error handling for database query failures
+  - [x] 2.6 Add proper TypeScript types for API response
+  - [x] 2.7 Test API endpoint with sample data
 - [ ] 3.0 Daily Winners Page Components
   - [ ] 3.1 Create app/daily-winners/page.tsx main page component
   - [ ] 3.2 Create components/daily-winners/DailyWinnerCard.tsx for individual winner display
