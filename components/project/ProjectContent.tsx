@@ -1,5 +1,6 @@
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
+import ReactMarkdown from "react-markdown";
 import { ProjectActions } from "./ProjectActions";
 
 interface ProjectContentProps {
@@ -56,61 +57,85 @@ export const ProjectContent = ({
         {longDescription && (
           <div>
             <h3 className="text-xl font-semibold mb-3">תיאור מפורט</h3>
-            <div
-              className="prose prose-gray max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-ul:text-gray-700 prose-ol:text-gray-700 prose-code:text-gray-800 prose-code:bg-gray-100 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-pre:bg-gray-100 prose-pre:text-gray-800"
-              dangerouslySetInnerHTML={{
-                __html: renderMarkdown(longDescription),
-              }}
-            />
+            <div className="prose prose-gray max-w-none">
+              <ReactMarkdown
+                components={{
+                  h1: ({ children }) => (
+                    <h1 className="text-lg font-bold mt-8 mb-4 text-gray-900">
+                      {children}
+                    </h1>
+                  ),
+                  h2: ({ children }) => (
+                    <h2 className="text-md font-semibold mt-6 mb-3 text-gray-900">
+                      {children}
+                    </h2>
+                  ),
+                  h3: ({ children }) => (
+                    <h3 className="text-base font-bold mt-4 mb-2 text-gray-900">
+                      {children}
+                    </h3>
+                  ),
+                  p: ({ children }) => (
+                    <p className="text-gray-700 mb-3 leading-relaxed">
+                      {children}
+                    </p>
+                  ),
+                  ul: ({ children }) => (
+                    <ul className="list-disc space-y-1 my-3 mr-6 text-gray-700">
+                      {children}
+                    </ul>
+                  ),
+                  ol: ({ children }) => (
+                    <ol className="list-decimal space-y-1 my-3 mr-6 text-gray-700">
+                      {children}
+                    </ol>
+                  ),
+                  li: ({ children }) => (
+                    <li className="text-gray-700">{children}</li>
+                  ),
+                  strong: ({ children }) => (
+                    <strong className="font-semibold text-gray-900">
+                      {children}
+                    </strong>
+                  ),
+                  em: ({ children }) => (
+                    <em className="italic text-gray-700">{children}</em>
+                  ),
+                  code: ({ children }) => (
+                    <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono text-gray-800">
+                      {children}
+                    </code>
+                  ),
+                  pre: ({ children }) => (
+                    <pre className="bg-gray-100 p-3 rounded-lg overflow-x-auto my-3">
+                      <code className="text-sm font-mono text-gray-800">
+                        {children}
+                      </code>
+                    </pre>
+                  ),
+                  a: ({ href, children }) => (
+                    <a
+                      href={href}
+                      className="text-blue-600 hover:underline hover:text-blue-800"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                    >
+                      {children}
+                    </a>
+                  ),
+                  blockquote: ({ children }) => (
+                    <blockquote className="border-r-4 border-gray-300 pr-4 my-3 italic text-gray-600">
+                      {children}
+                    </blockquote>
+                  ),
+                }}
+              >
+                {longDescription}
+              </ReactMarkdown>
+            </div>
           </div>
         )}
       </div>
     </>
-  );
-};
-
-// Simple markdown renderer function
-const renderMarkdown = (text: string): string => {
-  return (
-    text
-      // Headers
-      .replace(
-        /^### (.*$)/gim,
-        '<h3 class="text-lg font-semibold mt-4 mb-2">$1</h3>'
-      )
-      .replace(
-        /^## (.*$)/gim,
-        '<h2 class="text-xl font-semibold mt-6 mb-3">$1</h2>'
-      )
-      .replace(
-        /^# (.*$)/gim,
-        '<h1 class="text-2xl font-bold mt-8 mb-4">$1</h1>'
-      )
-      // Bold
-      .replace(/\*\*(.*?)\*\*/g, "<strong>$1</strong>")
-      // Italic
-      .replace(/\*(.*?)\*/g, "<em>$1</em>")
-      // Code blocks
-      .replace(
-        /```([\s\S]*?)```/g,
-        '<pre class="bg-gray-100 p-3 rounded-lg overflow-x-auto"><code>$1</code></pre>'
-      )
-      // Inline code
-      .replace(
-        /`([^`]+)`/g,
-        '<code class="bg-gray-100 px-1 py-0.5 rounded text-sm">$1</code>'
-      )
-      // Lists
-      .replace(/^\* (.*$)/gim, '<li class="ml-4">$1</li>')
-      .replace(/^- (.*$)/gim, '<li class="ml-4">$1</li>')
-      // Wrap lists in ul tags (simple approach)
-      .replace(/(<li.*<\/li>)/g, '<ul class="list-disc space-y-1 my-2">$1</ul>')
-      // Line breaks
-      .replace(/\n/g, "<br>")
-      // Links
-      .replace(
-        /\[([^\]]+)\]\(([^)]+)\)/g,
-        '<a href="$2" class="text-blue-600 hover:underline" target="_blank" rel="noopener noreferrer">$1</a>'
-      )
   );
 };
