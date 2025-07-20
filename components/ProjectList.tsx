@@ -29,22 +29,17 @@ interface ProjectListProps {
 }
 
 const ProjectListItem = ({ project }: { project: Project }) => {
-  const [voted, setVoted] = useState(false);
-  const { addVote, removeVote, isAddingVote, isRemovingVote } = useVote();
+  const { toggleVote, hasVoted, dailyVotes, isLoading } = useVote({
+    projectId: project.id,
+    initialDailyVotes: project.votes,
+    initialTotalVotes: project.votes,
+    initialHasVoted: false,
+  });
 
-  const handleVote = async (e: React.MouseEvent) => {
+  const handleVote = (e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-
-    if (isAddingVote || isRemovingVote) return;
-
-    if (voted) {
-      removeVote(project.id);
-      setVoted(false);
-    } else {
-      addVote(project.id);
-      setVoted(true);
-    }
+    toggleVote();
   };
 
   return (
@@ -59,10 +54,10 @@ const ProjectListItem = ({ project }: { project: Project }) => {
             variant="ghost"
             size="sm"
             onClick={handleVote}
-            disabled={isAddingVote || isRemovingVote}
+            disabled={isLoading}
             className="mt-2 text-xs text-blue-600 hover:text-blue-700"
           >
-            {isAddingVote || isRemovingVote ? (
+            {isLoading ? (
               <Loader2 className="w-3 h-3 animate-spin" />
             ) : (
               "Vibe it"
@@ -107,10 +102,10 @@ const ProjectListItem = ({ project }: { project: Project }) => {
             <div className="flex items-center gap-1">
               <Heart
                 className={`w-4 h-4 ${
-                  voted ? "fill-current text-red-500" : ""
+                  hasVoted ? "fill-current text-red-500" : ""
                 }`}
               />
-              <span>{project.votes}</span>
+              <span>{dailyVotes}</span>
             </div>
             <div className="flex items-center gap-1">
               <GitFork className="w-4 h-4" />

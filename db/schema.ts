@@ -7,6 +7,7 @@ import {
   boolean,
   jsonb,
   varchar,
+  index,
 } from "drizzle-orm/pg-core";
 import { relations } from "drizzle-orm";
 
@@ -53,7 +54,6 @@ export const projects = pgTable("projects", {
   liveUrl: text("live_url"),
   githubUrl: text("github_url"),
   votes: integer("votes").default(0),
-  comments: integer("comments").default(0),
   features: jsonb("features").$type<string[]>(),
   techDetails: text("tech_details"),
   challenges: text("challenges"),
@@ -62,16 +62,33 @@ export const projects = pgTable("projects", {
 });
 
 // Votes table
-export const votes = pgTable("votes", {
-  id: serial("id").primaryKey(),
-  userId: text("user_id")
-    .notNull()
-    .references(() => users.id, { onDelete: "cascade" }),
-  projectId: integer("project_id")
-    .notNull()
-    .references(() => projects.id, { onDelete: "cascade" }),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
+export const votes = pgTable(
+  "votes",
+  {
+    id: serial("id").primaryKey(),
+    userId: text("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    userProjectIdx: index("votes_user_project_idx").on(
+      table.userId,
+      table.projectId
+    ),
+    projectCreatedIdx: index("votes_project_created_idx").on(
+      table.projectId,
+      table.createdAt
+    ),
+    userCreatedIdx: index("votes_user_created_idx").on(
+      table.userId,
+      table.createdAt
+    ),
+  })
+);
 
 // Comments table
 export const comments = pgTable("comments", {

@@ -7,7 +7,11 @@ interface ProjectSidebarProps {
     name: string;
     avatar?: string;
   };
-  votes: number;
+  dailyVotes: number;
+  totalVotes: number;
+  hasVoted: boolean;
+  onVote: () => void;
+  isVoting: boolean;
   category?: {
     name: string;
   };
@@ -16,7 +20,11 @@ interface ProjectSidebarProps {
 
 export const ProjectSidebar = ({
   author,
-  votes,
+  dailyVotes,
+  totalVotes,
+  hasVoted,
+  onVote,
+  isVoting,
   category,
   technologiesCount,
 }: ProjectSidebarProps) => {
@@ -24,7 +32,11 @@ export const ProjectSidebar = ({
     <div className="space-y-6">
       <ProjectAuthor author={author} />
       <ProjectStats
-        votes={votes}
+        dailyVotes={dailyVotes}
+        totalVotes={totalVotes}
+        hasVoted={hasVoted}
+        onVote={onVote}
+        isVoting={isVoting}
         category={category}
         technologiesCount={technologiesCount}
       />

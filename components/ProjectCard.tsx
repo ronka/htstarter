@@ -1,10 +1,11 @@
-import { useState } from "react";
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
-import { Heart, ExternalLink } from "lucide-react";
+import { VoteButton } from "@/components/ui/vote-button";
+import { ExternalLink } from "lucide-react";
+import { useVote } from "@/hooks/use-vote";
 
 interface ProjectCardProps {
   id: string;
@@ -17,8 +18,9 @@ interface ProjectCardProps {
     id: string;
   };
   technologies: string[];
-  votes: number;
-  isVoted?: boolean;
+  dailyVotes?: number;
+  totalVotes?: number;
+  hasVoted?: boolean;
 }
 
 const ProjectCard = ({
@@ -28,21 +30,24 @@ const ProjectCard = ({
   image,
   author,
   technologies,
-  votes,
-  isVoted = false,
+  dailyVotes = 0,
+  totalVotes = 0,
+  hasVoted = false,
 }: ProjectCardProps) => {
-  const [voted, setVoted] = useState(isVoted);
-  const [voteCount, setVoteCount] = useState(votes);
+  const {
+    toggleVote,
+    dailyVotes: currentDailyVotes,
+    hasVoted: currentHasVoted,
+    isLoading,
+  } = useVote({
+    projectId: parseInt(id),
+    initialDailyVotes: dailyVotes,
+    initialTotalVotes: totalVotes,
+    initialHasVoted: hasVoted,
+  });
 
-  const handleVote = (e: React.MouseEvent) => {
-    e.preventDefault();
-    e.stopPropagation();
-    if (voted) {
-      setVoteCount((prev) => prev - 1);
-    } else {
-      setVoteCount((prev) => prev + 1);
-    }
-    setVoted(!voted);
+  const handleVote = () => {
+    toggleVote();
   };
 
   return (
@@ -55,21 +60,21 @@ const ProjectCard = ({
             className="w-full h-48 object-cover group-hover:scale-105 transition-transform duration-300"
           />
           <div className="absolute top-3 left-3">
-            <Button
-              variant={voted ? "default" : "secondary"}
-              size="sm"
+            <VoteButton
+              isVoted={currentHasVoted}
+              isLoading={isLoading}
               onClick={handleVote}
+              size="sm"
+              variant={currentHasVoted ? "default" : "secondary"}
+              showText={true}
               className={`${
-                voted
+                currentHasVoted
                   ? "bg-red-500 hover:bg-red-600 text-white"
                   : "bg-white/90 hover:bg-white"
               } backdrop-blur-sm shadow-sm`}
             >
-              <Heart
-                className={`w-4 h-4 ml-1 ${voted ? "fill-current" : ""}`}
-              />
-              {voteCount}
-            </Button>
+              {currentDailyVotes} today
+            </VoteButton>
           </div>
         </div>
 

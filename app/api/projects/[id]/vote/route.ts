@@ -1,143 +1,122 @@
 import { NextRequest, NextResponse } from "next/server";
-import { db } from "../../../../../db";
-import { votes, projects } from "../../../../../db/schema";
-import { eq, and } from "drizzle-orm";
-import { requireAuth } from "../../../../../lib/auth";
+import { auth } from "@clerk/nextjs/server";
+import { db } from "@/db";
+import { votes, projects } from "@/db/schema";
+import { eq, and, gte, desc } from "drizzle-orm";
 
-// POST /api/projects/[id]/vote
 export async function POST(
   request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
+  { params }: { params: { id: string } }
 ) {
   try {
-    const user = await requireAuth();
-    const { id } = await params;
-    const projectId = parseInt(id);
+    // Get authenticated user
+    const { userId } = await auth();
+    if (!userId) {
+      return NextResponse.json(
+        { error: "Authentication required" },
+        { status: 401 }
+      );
+    }
 
+    // Validate project ID
+    const projectId = parseInt(params.id);
     if (isNaN(projectId)) {
       return NextResponse.json(
-        { success: false, error: "Invalid project ID" },
+        { error: "Invalid project ID" },
         { status: 400 }
       );
     }
 
     // Check if project exists
-    const [project] = await db
-      .select()
+    const project = await db
+      .select({ id: projects.id })
       .from(projects)
       .where(eq(projects.id, projectId))
       .limit(1);
 
-    if (!project) {
-      return NextResponse.json(
-        { success: false, error: "Project not found" },
-        { status: 404 }
-      );
+    if (project.length === 0) {
+      return NextResponse.json({ error: "Project not found" }, { status: 404 });
     }
 
-    // Check if user already voted
+    // Get today's date (start of day)
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+
+    // Check if user has already voted today on this project
     const existingVote = await db
-      .select()
+      .select({ id: votes.id })
       .from(votes)
-      .where(and(eq(votes.userId, user.id), eq(votes.projectId, projectId)))
+      .where(
+        and(
+          eq(votes.userId, userId),
+          eq(votes.projectId, projectId),
+          gte(votes.createdAt, today)
+        )
+      )
       .limit(1);
 
-    if (existingVote[0]) {
-      return NextResponse.json(
-        { success: false, error: "User already voted for this project" },
-        { status: 400 }
-      );
+    if (existingVote.length > 0) {
+      // User has already voted today, remove the vote (toggle)
+      await db.delete(votes).where(eq(votes.id, existingVote[0].id));
+
+      // Get updated vote counts
+      const [dailyVotes, totalVotes] = await Promise.all([
+        // Count votes created today
+        db
+          .select({ count: votes.id })
+          .from(votes)
+          .where(
+            and(eq(votes.projectId, projectId), gte(votes.createdAt, today))
+          ),
+        // Count total votes
+        db
+          .select({ count: votes.id })
+          .from(votes)
+          .where(eq(votes.projectId, projectId)),
+      ]);
+
+      return NextResponse.json({
+        success: true,
+        hasVoted: false,
+        dailyVotes: dailyVotes.length,
+        totalVotes: totalVotes.length,
+        action: "unvoted",
+      });
+    } else {
+      // User hasn't voted today, create a new vote
+      await db.insert(votes).values({
+        userId,
+        projectId,
+      });
+
+      // Get updated vote counts
+      const [dailyVotes, totalVotes] = await Promise.all([
+        // Count votes created today
+        db
+          .select({ count: votes.id })
+          .from(votes)
+          .where(
+            and(eq(votes.projectId, projectId), gte(votes.createdAt, today))
+          ),
+        // Count total votes
+        db
+          .select({ count: votes.id })
+          .from(votes)
+          .where(eq(votes.projectId, projectId)),
+      ]);
+
+      return NextResponse.json({
+        success: true,
+        hasVoted: true,
+        dailyVotes: dailyVotes.length,
+        totalVotes: totalVotes.length,
+        action: "voted",
+      });
     }
-
-    // Create vote
-    await db.insert(votes).values({
-      userId: user.id,
-      projectId: projectId,
-    });
-
-    // Update project vote count
-    await db
-      .update(projects)
-      .set({ votes: project.votes + 1 })
-      .where(eq(projects.id, projectId));
-
-    return NextResponse.json({
-      success: true,
-      message: "Vote added successfully",
-    });
   } catch (error) {
-    console.error("Error adding vote:", error);
+    console.error("Vote API error:", error);
     return NextResponse.json(
-      { success: false, error: "Failed to add vote" },
-      { status: 500 }
-    );
-  }
-}
-
-// DELETE /api/projects/[id]/vote
-export async function DELETE(
-  request: NextRequest,
-  { params }: { params: Promise<{ id: string }> }
-) {
-  try {
-    const user = await requireAuth();
-    const { id } = await params;
-    const projectId = parseInt(id);
-
-    if (isNaN(projectId)) {
-      return NextResponse.json(
-        { success: false, error: "Invalid project ID" },
-        { status: 400 }
-      );
-    }
-
-    // Check if project exists
-    const [project] = await db
-      .select()
-      .from(projects)
-      .where(eq(projects.id, projectId))
-      .limit(1);
-
-    if (!project) {
-      return NextResponse.json(
-        { success: false, error: "Project not found" },
-        { status: 404 }
-      );
-    }
-
-    // Check if user has voted
-    const existingVote = await db
-      .select()
-      .from(votes)
-      .where(and(eq(votes.userId, user.id), eq(votes.projectId, projectId)))
-      .limit(1);
-
-    if (!existingVote[0]) {
-      return NextResponse.json(
-        { success: false, error: "User has not voted for this project" },
-        { status: 400 }
-      );
-    }
-
-    // Remove vote
-    await db
-      .delete(votes)
-      .where(and(eq(votes.userId, user.id), eq(votes.projectId, projectId)));
-
-    // Update project vote count
-    await db
-      .update(projects)
-      .set({ votes: Math.max(0, project.votes - 1) })
-      .where(eq(projects.id, projectId));
-
-    return NextResponse.json({
-      success: true,
-      message: "Vote removed successfully",
-    });
-  } catch (error) {
-    console.error("Error removing vote:", error);
-    return NextResponse.json(
-      { success: false, error: "Failed to remove vote" },
+      { error: "Internal server error" },
       { status: 500 }
     );
   }

@@ -11,8 +11,9 @@ interface ProjectMainProps {
   title: string;
   description: string;
   technologies: string[];
-  votes: number;
-  voted: boolean;
+  dailyVotes: number;
+  totalVotes: number;
+  hasVoted: boolean;
   onVote: () => void;
   isVoting: boolean;
   liveUrl?: string;
@@ -29,8 +30,9 @@ export const ProjectMain = ({
   title,
   description,
   technologies,
-  votes,
-  voted,
+  dailyVotes,
+  totalVotes,
+  hasVoted,
   onVote,
   isVoting,
   liveUrl,
@@ -55,8 +57,8 @@ export const ProjectMain = ({
         <ProjectImage
           image={image}
           title={title}
-          votes={votes}
-          voted={voted}
+          dailyVotes={dailyVotes}
+          hasVoted={hasVoted}
           onVote={onVote}
           isVoting={isVoting}
         />

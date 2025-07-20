@@ -8,6 +8,20 @@
       "when": 1752927901457,
       "tag": "0000_normal_punisher",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1752994558702,
+      "tag": "0001_loud_cloak",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1752994627665,
+      "tag": "0002_past_miss_america",
+      "breakpoints": true
     }
   ]
 }

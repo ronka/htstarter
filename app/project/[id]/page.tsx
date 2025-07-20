@@ -4,6 +4,7 @@ import { useParams } from "next/navigation";
 import { useState } from "react";
 import { useProject } from "@/hooks/use-project";
 import { useVote } from "@/hooks/use-vote";
+import { useVoteStats } from "@/hooks/use-vote-stats";
 import {
   ProjectDetailSkeleton,
   ProjectError,
@@ -17,25 +18,31 @@ interface ProjectDetailClientProps {
 }
 
 const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
-  const [voted, setVoted] = useState(false);
   const { data: project, isLoading, error } = useProject(id);
-  const { addVote, removeVote, isAddingVote, isRemovingVote } = useVote();
+  const { data: voteStats, isLoading: isVoteStatsLoading } = useVoteStats({
+    projectId: parseInt(id),
+    enabled: !!project,
+  });
 
-  const handleVote = async () => {
+  const {
+    toggleVote,
+    hasVoted,
+    dailyVotes,
+    totalVotes,
+    isLoading: isVoting,
+  } = useVote({
+    projectId: parseInt(id),
+    initialDailyVotes: voteStats?.dailyVotes || 0,
+    initialTotalVotes: voteStats?.totalVotes || 0,
+    initialHasVoted: voteStats?.hasVoted || false,
+  });
+
+  const handleVote = () => {
     if (!project) return;
-
-    if (isAddingVote || isRemovingVote) return;
-
-    if (voted) {
-      removeVote(project.id);
-      setVoted(false);
-    } else {
-      addVote(project.id);
-      setVoted(true);
-    }
+    toggleVote();
   };
 
-  if (isLoading) {
+  if (isLoading || isVoteStatsLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
         <ProjectDetailSkeleton />
@@ -63,10 +70,11 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
               title={project.title}
               description={project.description}
               technologies={project.technologies}
-              votes={project.votes}
-              voted={voted}
+              dailyVotes={dailyVotes}
+              totalVotes={totalVotes}
+              hasVoted={hasVoted}
               onVote={handleVote}
-              isVoting={isAddingVote || isRemovingVote}
+              isVoting={isVoting}
               liveUrl={project.liveUrl}
               githubUrl={project.githubUrl}
               features={project.features}
@@ -79,7 +87,11 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
 
           <ProjectSidebar
             author={project.author}
-            votes={project.votes}
+            dailyVotes={dailyVotes}
+            totalVotes={totalVotes}
+            hasVoted={hasVoted}
+            onVote={handleVote}
+            isVoting={isVoting}
             category={project.category}
             technologiesCount={project.technologies.length}
           />

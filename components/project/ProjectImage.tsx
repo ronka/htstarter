@@ -1,11 +1,10 @@
-import { Button } from "@/components/ui/button";
-import { Heart, Loader2 } from "lucide-react";
+import { VoteButton } from "@/components/ui/vote-button";
 
 interface ProjectImageProps {
   image: string;
   title: string;
-  votes: number;
-  voted: boolean;
+  dailyVotes: number;
+  hasVoted: boolean;
   onVote: () => void;
   isVoting: boolean;
 }
@@ -13,8 +12,8 @@ interface ProjectImageProps {
 export const ProjectImage = ({
   image,
   title,
-  votes,
-  voted,
+  dailyVotes,
+  hasVoted,
   onVote,
   isVoting,
 }: ProjectImageProps) => {
@@ -25,22 +24,22 @@ export const ProjectImage = ({
         alt={title}
         className="w-full h-64 object-cover rounded-t-lg"
       />
-      <div className="absolute top-4 left-4 flex gap-2">
-        <Button
-          size="sm"
-          className={`${
-            voted ? "bg-red-500 hover:bg-red-600" : "bg-white hover:bg-gray-100"
-          } text-gray-900`}
+      <div className="absolute top-4 left-4">
+        <VoteButton
+          isVoted={hasVoted}
+          isLoading={isVoting}
           onClick={onVote}
-          disabled={isVoting}
+          size="sm"
+          variant={hasVoted ? "default" : "secondary"}
+          showText={true}
+          className={`${
+            hasVoted
+              ? "bg-red-500 hover:bg-red-600 text-white"
+              : "bg-white/90 hover:bg-white text-gray-900"
+          } backdrop-blur-sm shadow-sm`}
         >
-          {isVoting ? (
-            <Loader2 className="w-4 h-4 animate-spin ml-1" />
-          ) : (
-            <Heart className={`w-4 h-4 ml-1 ${voted ? "fill-current" : ""}`} />
-          )}
-          {votes}
-        </Button>
+          {dailyVotes}
+        </VoteButton>
       </div>
     </div>
   );

@@ -1,105 +1,161 @@
+import { useState, useCallback, useEffect } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
+import { useAuth } from "@clerk/nextjs";
+import { useToast } from "@/hooks/use-toast";
 
 interface VoteResponse {
   success: boolean;
-  message: string;
-  error?: string;
+  hasVoted: boolean;
+  dailyVotes: number;
+  totalVotes: number;
+  action: "voted" | "unvoted";
 }
 
-async function addVote(projectId: number): Promise<VoteResponse> {
-  const response = await fetch(`/api/projects/${projectId}/vote`, {
-    method: "POST",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to add vote");
-  }
-
-  const result: VoteResponse = await response.json();
-
-  if (!result.success) {
-    throw new Error(result.error || "Failed to add vote");
-  }
-
-  return result;
+interface UseVoteOptions {
+  projectId: number;
+  initialDailyVotes?: number;
+  initialTotalVotes?: number;
+  initialHasVoted?: boolean;
 }
 
-async function removeVote(projectId: number): Promise<VoteResponse> {
-  const response = await fetch(`/api/projects/${projectId}/vote`, {
-    method: "DELETE",
-  });
-
-  if (!response.ok) {
-    throw new Error("Failed to remove vote");
-  }
-
-  const result: VoteResponse = await response.json();
-
-  if (!result.success) {
-    throw new Error(result.error || "Failed to remove vote");
-  }
-
-  return result;
-}
-
-export function useVote() {
+export const useVote = ({
+  projectId,
+  initialDailyVotes = 0,
+  initialTotalVotes = 0,
+  initialHasVoted = false,
+}: UseVoteOptions) => {
+  const { userId } = useAuth();
+  const { toast } = useToast();
   const queryClient = useQueryClient();
 
-  const addVoteMutation = useMutation({
-    mutationFn: addVote,
-    onSuccess: (data, projectId) => {
-      // Invalidate and refetch projects queries
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
+  // Local state for optimistic updates
+  const [dailyVotes, setDailyVotes] = useState(initialDailyVotes);
+  const [totalVotes, setTotalVotes] = useState(initialTotalVotes);
+  const [hasVoted, setHasVoted] = useState(initialHasVoted);
 
-      // Optimistically update the project's vote count
-      queryClient.setQueriesData({ queryKey: ["projects"] }, (oldData: any) => {
-        if (!oldData?.data) return oldData;
+  // Update state when initial values change (e.g., when project data loads)
+  useEffect(() => {
+    setDailyVotes(initialDailyVotes);
+    setTotalVotes(initialTotalVotes);
+    setHasVoted(initialHasVoted);
+  }, [initialDailyVotes, initialTotalVotes, initialHasVoted]);
 
-        return {
-          ...oldData,
-          data: oldData.data.map((project: any) =>
-            project.id === projectId
-              ? { ...project, votes: project.votes + 1 }
-              : project
-          ),
-        };
+  // Vote mutation
+  const voteMutation = useMutation({
+    mutationFn: async (): Promise<VoteResponse> => {
+      const response = await fetch(`/api/projects/${projectId}/vote`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Failed to vote");
+      }
+
+      return response.json();
+    },
+    onMutate: async () => {
+      // Optimistic update
+      const previousDailyVotes = dailyVotes;
+      const previousTotalVotes = totalVotes;
+      const previousHasVoted = hasVoted;
+
+      // Update local state optimistically
+      if (hasVoted) {
+        setDailyVotes(Math.max(0, dailyVotes - 1));
+        setTotalVotes(Math.max(0, totalVotes - 1));
+        setHasVoted(false);
+      } else {
+        setDailyVotes(dailyVotes + 1);
+        setTotalVotes(totalVotes + 1);
+        setHasVoted(true);
+      }
+
+      // Invalidate related queries
+      await queryClient.invalidateQueries({
+        queryKey: ["projects"],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["project", projectId],
+      });
+      await queryClient.invalidateQueries({
+        queryKey: ["vote-stats", projectId],
+      });
+
+      return {
+        previousDailyVotes,
+        previousTotalVotes,
+        previousHasVoted,
+      };
+    },
+    onSuccess: (data) => {
+      // Update state with actual response
+      setDailyVotes(data.dailyVotes);
+      setTotalVotes(data.totalVotes);
+      setHasVoted(data.hasVoted);
+
+      // Show success toast
+      toast({
+        title: data.action === "voted" ? "Vote added!" : "Vote removed!",
+        description:
+          data.action === "voted"
+            ? "Your vote has been recorded for today."
+            : "Your vote has been removed.",
       });
     },
-    onError: (error) => {
-      toast.error("Failed to add vote");
+    onError: (error, variables, context) => {
+      // Revert optimistic update
+      if (context) {
+        setDailyVotes(context.previousDailyVotes);
+        setTotalVotes(context.previousTotalVotes);
+        setHasVoted(context.previousHasVoted);
+      }
+
+      // Show error toast
+      toast({
+        title: "Vote failed",
+        description:
+          error.message || "Failed to process your vote. Please try again.",
+        variant: "destructive",
+      });
     },
   });
 
-  const removeVoteMutation = useMutation({
-    mutationFn: removeVote,
-    onSuccess: (data, projectId) => {
-      // Invalidate and refetch projects queries
-      queryClient.invalidateQueries({ queryKey: ["projects"] });
-
-      // Optimistically update the project's vote count
-      queryClient.setQueriesData({ queryKey: ["projects"] }, (oldData: any) => {
-        if (!oldData?.data) return oldData;
-
-        return {
-          ...oldData,
-          data: oldData.data.map((project: any) =>
-            project.id === projectId
-              ? { ...project, votes: Math.max(0, project.votes - 1) }
-              : project
-          ),
-        };
+  // Toggle vote function
+  const toggleVote = useCallback(() => {
+    if (!userId) {
+      toast({
+        title: "Authentication required",
+        description: "Please sign in to vote for projects.",
+        variant: "destructive",
       });
-    },
-    onError: (error) => {
-      toast.error("Failed to remove vote");
-    },
-  });
+      return;
+    }
+
+    voteMutation.mutate();
+  }, [userId, voteMutation, toast]);
+
+  // Check if user can vote (hasn't voted today)
+  const canVote = !hasVoted;
+
+  // Loading state
+  const isLoading = voteMutation.isPending;
 
   return {
-    addVote: addVoteMutation.mutate,
-    removeVote: removeVoteMutation.mutate,
-    isAddingVote: addVoteMutation.isPending,
-    isRemovingVote: removeVoteMutation.isPending,
+    // State
+    dailyVotes,
+    totalVotes,
+    hasVoted,
+    canVote,
+    isLoading,
+
+    // Actions
+    toggleVote,
+
+    // Utilities
+    isAuthenticated: !!userId,
   };
-}
+};
