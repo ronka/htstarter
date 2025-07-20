@@ -472,15 +472,22 @@ export const Step2TechnicalDetails = ({
         <div className="space-y-2 mt-3">
           {formData.features.map((feature, index) => (
             <div key={index} className="flex gap-2">
-              {formData.features.length > 1 && (
-                <Button
-                  type="button"
-                  variant="outline"
-                  size="icon"
-                  onClick={() => removeFeature(index)}
-                >
-                  <X className="w-4 h-4" />
-                </Button>
+              {formData.features.length > 0 && (
+                <>
+                  <Input
+                    value={feature}
+                    onChange={(e) => updateFeature(index, e.target.value)}
+                    placeholder={`פיצ׳ר ${index + 1}`}
+                  />
+                  <Button
+                    type="button"
+                    variant="outline"
+                    size="icon"
+                    onClick={() => removeFeature(index)}
+                  >
+                    <X className="w-4 h-4" />
+                  </Button>
+                </>
               )}
             </div>
           ))}
