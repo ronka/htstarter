@@ -1,9 +1,15 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Heart, GitFork, Loader2 } from "lucide-react";
+import { Heart, GitFork, Loader2, ChevronDown } from "lucide-react";
 import { useTodayProjects } from "@/hooks/use-today-projects";
 import { useVote } from "@/hooks/use-vote";
 import { useState } from "react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 interface Project {
   id: number;
@@ -28,6 +34,19 @@ interface ProjectListProps {
   category?: string;
   search?: string;
 }
+
+type SortOption = {
+  value: string;
+  label: string;
+  order: string;
+};
+
+const sortOptions: SortOption[] = [
+  { value: "createdAt", label: "הכי חדש", order: "desc" },
+  { value: "createdAt", label: "הכי ישן", order: "asc" },
+  { value: "votes", label: "הכי פופולרי", order: "desc" },
+  { value: "votes", label: "הכי פחות פופולרי", order: "asc" },
+];
 
 const ProjectListItem = ({ project }: { project: Project }) => {
   const { toggleVote, hasVoted, dailyVotes, isLoading } = useVote({
@@ -122,9 +141,14 @@ const ProjectList = ({
   category,
   search,
 }: ProjectListProps) => {
+  const [sortBy, setSortBy] = useState("createdAt");
+  const [sortOrder, setSortOrder] = useState("desc");
+
   const { data, isLoading, error } = useTodayProjects({
     category,
     search,
+    sortBy,
+    sortOrder,
   });
 
   const projects = data?.data || initialProjects || [];
@@ -137,12 +161,24 @@ const ProjectList = ({
     day: "numeric",
   });
 
+  const handleSortChange = (option: SortOption) => {
+    setSortBy(option.value);
+    setSortOrder(option.order);
+  };
+
+  const getCurrentSortLabel = () => {
+    const currentOption = sortOptions.find(
+      (option) => option.value === sortBy && option.order === sortOrder
+    );
+    return currentOption?.label || "מיון";
+  };
+
   if (isLoading && !initialProjects) {
     return (
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-1">
-            Today's Projects
+            פרויקטי היום
           </h2>
           <p className="text-gray-600">{today}</p>
         </div>
@@ -172,14 +208,14 @@ const ProjectList = ({
       <div className="space-y-6">
         <div className="text-center">
           <h2 className="text-2xl font-bold text-gray-900 mb-1">
-            Today's Projects
+            פרויקטי היום
           </h2>
           <p className="text-gray-600">{today}</p>
         </div>
         <div className="text-center py-12">
           <div className="text-red-400 text-6xl mb-4">⚠️</div>
           <h3 className="text-xl font-semibold text-gray-600 mb-2">
-            Error loading projects
+            שגיאה בטעינת הפרויקטים
           </h3>
           <p className="text-gray-500">{error.message}</p>
         </div>
@@ -190,10 +226,44 @@ const ProjectList = ({
   return (
     <div className="space-y-6">
       <div className="text-center">
-        <h2 className="text-2xl font-bold text-gray-900 mb-1">
-          Today's Projects
-        </h2>
+        <h2 className="text-2xl font-bold text-gray-900 mb-1">פרויקטי היום</h2>
         <p className="text-gray-600">{today}</p>
+      </div>
+
+      {/* Sort Controls */}
+      <div className="flex justify-end">
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline" className="gap-2" disabled={isLoading}>
+              {isLoading ? (
+                <>
+                  <Loader2 className="w-4 h-4 animate-spin" />
+                  טוען...
+                </>
+              ) : (
+                <>
+                  {getCurrentSortLabel()}
+                  <ChevronDown className="w-4 h-4" />
+                </>
+              )}
+            </Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent align="end">
+            {sortOptions.map((option, index) => (
+              <DropdownMenuItem
+                key={index}
+                onClick={() => handleSortChange(option)}
+                className={
+                  sortBy === option.value && sortOrder === option.order
+                    ? "bg-blue-50"
+                    : ""
+                }
+              >
+                {option.label}
+              </DropdownMenuItem>
+            ))}
+          </DropdownMenuContent>
+        </DropdownMenu>
       </div>
 
       <div className="space-y-4">
@@ -205,10 +275,10 @@ const ProjectList = ({
           <div className="text-center py-12">
             <div className="text-gray-400 text-6xl mb-4">🔍</div>
             <h3 className="text-xl font-semibold text-gray-600 mb-2">
-              No projects found
+              לא נמצאו פרויקטים
             </h3>
             <p className="text-gray-500">
-              Try adjusting your search or filter criteria
+              נסה לשנות את החיפוש או קריטריוני הסינון
             </p>
           </div>
         )}

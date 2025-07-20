@@ -78,8 +78,18 @@ async function fetchTodayProjects(
 
 export function useTodayProjects(params: TodayProjectsParams = {}) {
   return useQuery({
-    queryKey: ["today-projects", params],
+    queryKey: [
+      "today-projects",
+      params.category,
+      params.search,
+      params.page,
+      params.limit,
+      params.sortBy,
+      params.sortOrder,
+    ],
     queryFn: () => fetchTodayProjects(params),
-    staleTime: 1000 * 60 * 2, // 2 minutes - shorter stale time for today's data
+    staleTime: 1000 * 30, // 30 seconds - shorter stale time for better responsiveness
+    refetchOnWindowFocus: false,
+    refetchOnMount: true,
   });
 }
