@@ -6,6 +6,13 @@ import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { X, Loader2 } from "lucide-react";
 import { toast } from "sonner";
+import { ImageUploader } from "@/components/ImageUploader";
+
+interface UploadedImage {
+  url: string;
+  filename: string;
+  size: number;
+}
 
 interface ProjectFormProps {
   onClose: () => void;
@@ -43,6 +50,7 @@ const ProjectForm = ({
     techDetails: "",
     challenges: "",
   });
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [isSubmitting, setIsSubmitting] = useState(false);
 
   // Initialize form with existing data if editing
@@ -60,13 +68,46 @@ const ProjectForm = ({
         techDetails: initialData.techDetails || "",
         challenges: initialData.challenges || "",
       });
+
+      // If editing and there's an existing image, add it to uploaded images
+      if (initialData.image) {
+        setUploadedImages([
+          {
+            url: initialData.image,
+            filename: "existing-image",
+            size: 0,
+          },
+        ]);
+      }
     }
   }, [mode, initialData]);
+
+  const handleImageUpload = (images: UploadedImage[]) => {
+    setUploadedImages(images);
+    // Set the first image URL as the main image
+    if (images.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        image: images[0].url,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        image: "",
+      }));
+    }
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
     if (isSubmitting) return;
+
+    // Validate that at least one image is uploaded
+    if (uploadedImages.length === 0) {
+      toast.error("אנא העלה לפחות תמונה אחת לפרויקט");
+      return;
+    }
 
     setIsSubmitting(true);
 
@@ -210,15 +251,11 @@ const ProjectForm = ({
             </div>
 
             <div>
-              <Label htmlFor="image">קישור לתמונת הפרויקט *</Label>
-              <Input
-                id="image"
-                name="image"
-                value={formData.image}
-                onChange={handleChange}
-                placeholder="https://example.com/image.png"
-                type="url"
-                required
+              <Label htmlFor="image">תמונת הפרויקט *</Label>
+              <ImageUploader
+                onUpload={handleImageUpload}
+                maxFiles={1}
+                maxSize={5}
               />
             </div>
 

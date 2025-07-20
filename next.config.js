@@ -19,6 +19,12 @@ const nextConfig = {
   reactStrictMode: true,
   // Optimize images
   images: {
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "*.blob.vercel-storage.com",
+      },
+    ],
     domains: ["images.unsplash.com"],
   },
   // Configure environment variables

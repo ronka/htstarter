@@ -20,6 +20,13 @@ import {
 } from "lucide-react";
 import { useSubmitProject } from "@/hooks/use-submit-project";
 import { useCategories } from "@/hooks/use-categories";
+import { ImageUploader } from "@/components/ImageUploader";
+
+interface UploadedImage {
+  url: string;
+  filename: string;
+  size: number;
+}
 
 interface ProjectFormData {
   title: string;
@@ -42,6 +49,7 @@ export default function SubmitPage() {
   const { data: categories = [], isLoading: categoriesLoading } =
     useCategories();
   const [currentStep, setCurrentStep] = useState(1);
+  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [formData, setFormData] = useState<ProjectFormData>({
     title: "",
     description: "",
@@ -57,7 +65,6 @@ export default function SubmitPage() {
   });
 
   const [techInput, setTechInput] = useState("");
-  const [imagePreview, setImagePreview] = useState("");
 
   // Set default category when categories are loaded
   useEffect(() => {
@@ -88,6 +95,22 @@ export default function SubmitPage() {
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleImageUpload = (images: UploadedImage[]) => {
+    setUploadedImages(images);
+    // Set the first image URL as the main image
+    if (images.length > 0) {
+      setFormData((prev) => ({
+        ...prev,
+        image: images[0].url,
+      }));
+    } else {
+      setFormData((prev) => ({
+        ...prev,
+        image: "",
+      }));
+    }
   };
 
   const addTechnology = () => {
@@ -130,18 +153,14 @@ export default function SubmitPage() {
     }));
   };
 
-  const handleImageUrlChange = (url: string) => {
-    handleInputChange("image", url);
-    setImagePreview(url);
-  };
-
   const validateStep = (step: number) => {
     switch (step) {
       case 1:
         return (
           formData.title.trim() &&
           formData.description.trim() &&
-          formData.liveUrl.trim()
+          formData.liveUrl.trim() &&
+          uploadedImages.length > 0
         );
       case 2:
         return (
@@ -155,11 +174,26 @@ export default function SubmitPage() {
     }
   };
 
+  const getStep1ValidationMessage = () => {
+    if (!formData.title.trim()) return "שם הפרויקט נדרש";
+    if (!formData.description.trim()) return "תיאור הפרויקט נדרש";
+    if (!formData.liveUrl.trim()) return "קישור לדמו חי נדרש";
+    if (uploadedImages.length === 0) return "תמונת הפרויקט נדרשת";
+    return null;
+  };
+
   const handleSubmit = () => {
     if (!userId) {
       console.error("User is not authenticated.");
       // Optionally, redirect to sign-in or show a message
       router.push("/sign-in");
+      return;
+    }
+
+    // Validate that at least one image is uploaded
+    if (uploadedImages.length === 0) {
+      // Show error message and stay on step 1
+      setCurrentStep(1);
       return;
     }
 
@@ -232,6 +266,11 @@ export default function SubmitPage() {
           <CardContent className="space-y-6">
             {currentStep === 1 && (
               <>
+                {getStep1ValidationMessage() && (
+                  <div className="bg-red-50 border border-red-200 text-red-800 px-4 py-3 rounded-lg">
+                    {getStep1ValidationMessage()}
+                  </div>
+                )}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="space-y-4">
                     <div>
@@ -288,24 +327,12 @@ export default function SubmitPage() {
 
                   <div className="space-y-4">
                     <div>
-                      <Label htmlFor="image">קישור לתמונת הפרויקט *</Label>
-                      <Input
-                        id="image"
-                        type="url"
-                        value={formData.image}
-                        onChange={(e) => handleImageUrlChange(e.target.value)}
-                        placeholder="https://example.com/image.jpg"
-                        required
+                      <Label htmlFor="image">תמונת הפרויקט *</Label>
+                      <ImageUploader
+                        onUpload={handleImageUpload}
+                        maxFiles={1}
+                        maxSize={5}
                       />
-                      {imagePreview && (
-                        <div className="mt-2">
-                          <img
-                            src={imagePreview}
-                            alt="תצוגה מקדימה"
-                            className="w-full h-32 object-cover rounded border"
-                          />
-                        </div>
-                      )}
                     </div>
 
                     <div>
@@ -483,10 +510,10 @@ export default function SubmitPage() {
                         )}
                       </div>
                     </div>
-                    {formData.image && (
+                    {uploadedImages.length > 0 && (
                       <div>
                         <img
-                          src={formData.image}
+                          src={uploadedImages[0].url}
                           alt={formData.title}
                           className="w-full h-32 object-cover rounded border"
                         />
@@ -502,7 +529,7 @@ export default function SubmitPage() {
                   <ul className="text-sm text-amber-700 space-y-1">
                     <li>• וודא שכל הפרטים נכונים</li>
                     <li>• בדוק שהקישורים עובדים</li>
-                    <li>• ודא שהתמונה מוצגת כראוי</li>
+                    <li>• ודא שהתמונה הועלתה ומוצגת כראוי</li>
                   </ul>
                 </div>
               </div>
