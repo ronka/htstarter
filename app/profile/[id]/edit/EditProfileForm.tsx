@@ -18,7 +18,6 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { ArrowLeft, X, Plus } from "lucide-react";
-import Header from "@/components/Header";
 import { useUpdateUserProfile } from "@/hooks/use-update-user-profile";
 
 interface Experience {
@@ -208,8 +207,6 @@ export function EditProfileForm({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-6">
           <Link

@@ -46,12 +46,6 @@ const ProfileInfo = ({ user }: ProfileInfoProps) => {
         <div className="flex justify-center gap-4 mb-6">
           <div className="text-center">
             <div className="text-xl font-bold text-gray-900">
-              {user.projects || 0}
-            </div>
-            <div className="text-sm text-gray-500">פרויקטים</div>
-          </div>
-          <div className="text-center">
-            <div className="text-xl font-bold text-gray-900">
               {user.followers || 0}
             </div>
             <div className="text-sm text-gray-500">עוקבים</div>

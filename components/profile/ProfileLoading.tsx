@@ -1,10 +1,8 @@
 import { Skeleton } from "@/components/ui/skeleton";
-import Header from "@/components/Header";
 
 const ProfileLoading = () => {
   return (
     <div className="min-h-screen bg-gray-50" dir="rtl">
-      <Header />
       <div className="max-w-6xl mx-auto px-4 py-12">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           {/* Profile Info Skeleton */}

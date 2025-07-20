@@ -3,7 +3,6 @@
 import { useParams, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useAuth } from "@clerk/nextjs";
-import Header from "@/components/Header";
 import { useProject } from "@/hooks/use-project";
 import ProjectForm from "@/components/ProjectForm";
 
@@ -85,7 +84,6 @@ export default function EditProjectPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       {showForm && (
         <ProjectForm
           onClose={handleCloseForm}

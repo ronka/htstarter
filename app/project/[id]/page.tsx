@@ -2,7 +2,6 @@
 
 import { useParams } from "next/navigation";
 import { useState } from "react";
-import Header from "@/components/Header";
 import { useProject } from "@/hooks/use-project";
 import { useVote } from "@/hooks/use-vote";
 import {
@@ -39,7 +38,6 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
         <ProjectDetailSkeleton />
       </div>
     );
@@ -48,7 +46,6 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
   if (error || !project) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Header />
         <ProjectError error={error} />
       </div>
     );
@@ -56,8 +53,6 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
       <div className="max-w-6xl mx-auto px-4 py-8">
         <ProjectHeader />
 

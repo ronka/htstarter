@@ -18,7 +18,6 @@ import {
   Github,
   ExternalLink,
 } from "lucide-react";
-import Header from "@/components/Header";
 import { useSubmitProject } from "@/hooks/use-submit-project";
 import { useCategories } from "@/hooks/use-categories";
 
@@ -180,8 +179,6 @@ export default function SubmitPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
-
       <div className="max-w-4xl mx-auto px-4 py-8">
         <div className="mb-8">
           <Button

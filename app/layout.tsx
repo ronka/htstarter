@@ -6,6 +6,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { Toaster } from "@/components/ui/toaster";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Providers } from "@/components/Providers";
+import HeaderWrapper from "@/components/HeaderWrapper";
 
 const notoSansHebrew = Noto_Sans_Hebrew({
   subsets: ["hebrew", "latin"],
@@ -35,7 +36,7 @@ export default function RootLayout({
               disableTransitionOnChange
             >
               <TooltipProvider>
-                {children}
+                <HeaderWrapper>{children}</HeaderWrapper>
                 <Toaster />
               </TooltipProvider>
             </ThemeProvider>

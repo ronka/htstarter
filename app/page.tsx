@@ -1,7 +1,6 @@
 "use client";
 
 import { useState } from "react";
-import Header from "@/components/Header";
 import FilterBar from "@/components/FilterBar";
 import ProjectList from "@/components/ProjectList";
 import Sidebar from "@/components/Sidebar";
@@ -20,7 +19,6 @@ export default function HomePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Header />
       <FilterBar
         onSearch={handleSearch}
         onCategoryFilter={handleCategoryFilter}
