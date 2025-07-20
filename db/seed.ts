@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { users, categories, projects } from "./schema";
+import { users, categories, projects, dailyWinners } from "./schema";
 import { mockUsers, mockProjects } from "../data/mockData";
 
 async function seed() {
@@ -8,6 +8,7 @@ async function seed() {
 
     // Clear existing data
     console.log("🗑️  Clearing existing data...");
+    await db.delete(dailyWinners);
     await db.delete(projects);
     await db.delete(users);
     await db.delete(categories);
@@ -107,11 +108,59 @@ async function seed() {
       .returning();
     console.log(`✅ Inserted ${insertedProjects.length} projects`);
 
+    // Seed daily winners
+    console.log("🏆 Seeding daily winners...");
+    const today = new Date();
+    const dailyWinnersData = [
+      {
+        projectId: insertedProjects[0].id,
+        winDate: new Date(today.getTime() - 1 * 24 * 60 * 60 * 1000), // Yesterday
+        voteCount: 45,
+      },
+      {
+        projectId: insertedProjects[1].id,
+        winDate: new Date(today.getTime() - 2 * 24 * 60 * 60 * 1000), // 2 days ago
+        voteCount: 38,
+      },
+      {
+        projectId: insertedProjects[2].id,
+        winDate: new Date(today.getTime() - 3 * 24 * 60 * 60 * 1000), // 3 days ago
+        voteCount: 52,
+      },
+      {
+        projectId: insertedProjects[3].id,
+        winDate: new Date(today.getTime() - 4 * 24 * 60 * 60 * 1000), // 4 days ago
+        voteCount: 29,
+      },
+      {
+        projectId: insertedProjects[4].id,
+        winDate: new Date(today.getTime() - 5 * 24 * 60 * 60 * 1000), // 5 days ago
+        voteCount: 41,
+      },
+      {
+        projectId: insertedProjects[0].id,
+        winDate: new Date(today.getTime() - 6 * 24 * 60 * 60 * 1000), // 6 days ago
+        voteCount: 33,
+      },
+      {
+        projectId: insertedProjects[1].id,
+        winDate: new Date(today.getTime() - 7 * 24 * 60 * 60 * 1000), // 7 days ago
+        voteCount: 47,
+      },
+    ];
+
+    const insertedDailyWinners = await db
+      .insert(dailyWinners)
+      .values(dailyWinnersData)
+      .returning();
+    console.log(`✅ Inserted ${insertedDailyWinners.length} daily winners`);
+
     console.log("🎉 Database seeding completed successfully!");
     console.log(`📊 Summary:`);
     console.log(`   - ${insertedCategories.length} categories`);
     console.log(`   - ${insertedUsers.length} users`);
     console.log(`   - ${insertedProjects.length} projects`);
+    console.log(`   - ${insertedDailyWinners.length} daily winners`);
   } catch (error) {
     console.error("❌ Error seeding database:", error);
     process.exit(1);
