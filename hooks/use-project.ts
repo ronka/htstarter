@@ -12,7 +12,7 @@ interface Project {
   };
   technologies: string[];
   votes: number;
-
+  dailyWinsCount: number;
   createdAt: string;
   liveUrl?: string;
   githubUrl?: string;

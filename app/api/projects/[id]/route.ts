@@ -1,7 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../db";
-import { projects, users, categories } from "../../../../db/schema";
-import { eq } from "drizzle-orm";
+import {
+  projects,
+  users,
+  categories,
+  dailyWinners,
+} from "../../../../db/schema";
+import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, isAuthorized } from "../../../../lib/auth";
 
@@ -55,12 +60,16 @@ export async function GET(
         liveUrl: projects.liveUrl,
         githubUrl: projects.githubUrl,
         votes: projects.votes,
-
         features: projects.features,
         techDetails: projects.techDetails,
         challenges: projects.challenges,
         createdAt: projects.createdAt,
         updatedAt: projects.updatedAt,
+        dailyWinsCount: sql<number>`(
+          SELECT COUNT(*)::int 
+          FROM ${dailyWinners} 
+          WHERE ${dailyWinners.projectId} = ${projects.id}
+        )`,
         author: {
           id: users.id,
           name: users.name,

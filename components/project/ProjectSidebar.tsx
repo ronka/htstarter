@@ -16,6 +16,7 @@ interface ProjectSidebarProps {
     name: string;
   };
   technologiesCount: number;
+  dailyWinsCount: number;
 }
 
 export const ProjectSidebar = ({
@@ -27,6 +28,7 @@ export const ProjectSidebar = ({
   isVoting,
   category,
   technologiesCount,
+  dailyWinsCount,
 }: ProjectSidebarProps) => {
   return (
     <div className="space-y-6">
@@ -39,6 +41,7 @@ export const ProjectSidebar = ({
         isVoting={isVoting}
         category={category}
         technologiesCount={technologiesCount}
+        dailyWinsCount={dailyWinsCount}
       />
     </div>
   );

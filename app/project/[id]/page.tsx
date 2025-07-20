@@ -94,6 +94,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
             isVoting={isVoting}
             category={project.category}
             technologiesCount={project.technologies.length}
+            dailyWinsCount={project.dailyWinsCount}
           />
         </div>
       </div>
