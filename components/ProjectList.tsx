@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Heart, GitFork, Loader2 } from "lucide-react";
-import { useProjects } from "@/hooks/use-projects";
+import { useTodayProjects } from "@/hooks/use-today-projects";
 import { useVote } from "@/hooks/use-vote";
 import { useState } from "react";
 
@@ -17,6 +17,7 @@ interface Project {
   };
   technologies: string[];
   votes: number;
+  todayVotes: number; // Today's vote count
   createdAt: string;
   liveUrl?: string;
   githubUrl?: string;
@@ -31,7 +32,7 @@ interface ProjectListProps {
 const ProjectListItem = ({ project }: { project: Project }) => {
   const { toggleVote, hasVoted, dailyVotes, isLoading } = useVote({
     projectId: project.id,
-    initialDailyVotes: project.votes,
+    initialDailyVotes: project.todayVotes, // Use today's vote count from API
     initialTotalVotes: project.votes,
     initialHasVoted: false,
   });
@@ -46,9 +47,7 @@ const ProjectListItem = ({ project }: { project: Project }) => {
     <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
       <div className="flex gap-4">
         <div className="flex flex-col items-center min-w-[60px]">
-          <div className="text-2xl font-bold text-gray-900">
-            {Math.floor(Math.random() * 9) + 1}
-          </div>
+          <div className="text-2xl font-bold text-gray-900">{dailyVotes}</div>
           <div className="text-xs text-gray-500">Vibes</div>
           <Button
             variant="ghost"
@@ -105,7 +104,7 @@ const ProjectListItem = ({ project }: { project: Project }) => {
                   hasVoted ? "fill-current text-red-500" : ""
                 }`}
               />
-              <span>{dailyVotes}</span>
+              <span>{dailyVotes} votes today</span>
             </div>
             <div className="flex items-center gap-1">
               <GitFork className="w-4 h-4" />
@@ -123,64 +122,97 @@ const ProjectList = ({
   category,
   search,
 }: ProjectListProps) => {
-  const { data, isLoading, error } = useProjects({
+  const { data, isLoading, error } = useTodayProjects({
     category,
     search,
   });
 
   const projects = data?.data || initialProjects || [];
 
+  // Get today's date in Hebrew format
+  const today = new Date().toLocaleDateString("he-IL", {
+    weekday: "long",
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
+
   if (isLoading && !initialProjects) {
     return (
-      <div className="space-y-4">
-        {[...Array(3)].map((_, i) => (
-          <div
-            key={i}
-            className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
-          >
-            <div className="flex gap-4">
-              <div className="w-20 h-16 bg-gray-200 rounded-lg"></div>
-              <div className="flex-1">
-                <div className="h-6 bg-gray-200 rounded mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded mb-2"></div>
-                <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">
+            Today's Projects
+          </h2>
+          <p className="text-gray-600">{today}</p>
+        </div>
+        <div className="space-y-4">
+          {[...Array(3)].map((_, i) => (
+            <div
+              key={i}
+              className="bg-white border border-gray-200 rounded-lg p-4 animate-pulse"
+            >
+              <div className="flex gap-4">
+                <div className="w-20 h-16 bg-gray-200 rounded-lg"></div>
+                <div className="flex-1">
+                  <div className="h-6 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded mb-2"></div>
+                  <div className="h-4 bg-gray-200 rounded w-2/3"></div>
+                </div>
               </div>
             </div>
-          </div>
-        ))}
+          ))}
+        </div>
       </div>
     );
   }
 
   if (error) {
     return (
-      <div className="text-center py-12">
-        <div className="text-red-400 text-6xl mb-4">⚠️</div>
-        <h3 className="text-xl font-semibold text-gray-600 mb-2">
-          Error loading projects
-        </h3>
-        <p className="text-gray-500">{error.message}</p>
+      <div className="space-y-6">
+        <div className="text-center">
+          <h2 className="text-2xl font-bold text-gray-900 mb-1">
+            Today's Projects
+          </h2>
+          <p className="text-gray-600">{today}</p>
+        </div>
+        <div className="text-center py-12">
+          <div className="text-red-400 text-6xl mb-4">⚠️</div>
+          <h3 className="text-xl font-semibold text-gray-600 mb-2">
+            Error loading projects
+          </h3>
+          <p className="text-gray-500">{error.message}</p>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-4">
-      {projects.map((project) => (
-        <ProjectListItem key={project.id} project={project} />
-      ))}
+    <div className="space-y-6">
+      <div className="text-center">
+        <h2 className="text-2xl font-bold text-gray-900 mb-1">
+          Today's Projects
+        </h2>
+        <p className="text-gray-600">{today}</p>
+      </div>
 
-      {projects.length === 0 && (
-        <div className="text-center py-12">
-          <div className="text-gray-400 text-6xl mb-4">🔍</div>
-          <h3 className="text-xl font-semibold text-gray-600 mb-2">
-            No projects found
-          </h3>
-          <p className="text-gray-500">
-            Try adjusting your search or filter criteria
-          </p>
-        </div>
-      )}
+      <div className="space-y-4">
+        {projects.map((project) => (
+          <ProjectListItem key={project.id} project={project} />
+        ))}
+
+        {projects.length === 0 && (
+          <div className="text-center py-12">
+            <div className="text-gray-400 text-6xl mb-4">🔍</div>
+            <h3 className="text-xl font-semibold text-gray-600 mb-2">
+              No projects found
+            </h3>
+            <p className="text-gray-500">
+              Try adjusting your search or filter criteria
+            </p>
+          </div>
+        )}
+      </div>
     </div>
   );
 };

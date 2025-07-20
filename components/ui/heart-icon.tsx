@@ -28,10 +28,7 @@ export const HeartIcon = ({
 
   if (isVoted) {
     return (
-      <Heart
-        className={cn("text-red-500 fill-red-500", className)}
-        size={size}
-      />
+      <Heart className={cn("text-white fill-white", className)} size={size} />
     );
   }
 

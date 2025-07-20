@@ -79,6 +79,9 @@ export const useVote = ({
         queryKey: ["projects"],
       });
       await queryClient.invalidateQueries({
+        queryKey: ["today-projects"],
+      });
+      await queryClient.invalidateQueries({
         queryKey: ["project", projectId],
       });
       await queryClient.invalidateQueries({
