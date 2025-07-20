@@ -26,24 +26,19 @@ interface ImageUploaderProps {
 
 export function ImageUploader({
   onUpload,
-  maxFiles = 5,
+  maxFiles = 1, // Changed default to 1 for single image
   maxSize = 10,
   acceptedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"],
   initialImages = [],
 }: ImageUploaderProps) {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadedImages, setUploadedImages] =
-    useState<UploadedImage[]>(initialImages);
+  const [uploadedImage, setUploadedImage] = useState<UploadedImage | null>(
+    initialImages.length > 0 ? initialImages[0] : null
+  );
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
-
-  useEffect(() => {
-    if (initialImages.length > 0 && onUpload) {
-      onUpload(initialImages);
-    }
-  }, [initialImages, onUpload]);
 
   const uploadFile = async (file: File): Promise<UploadedImage> => {
     const formData = new FormData();
@@ -59,7 +54,7 @@ export function ImageUploader({
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new Error(errorData.error || "Upload failed");
+      throw new Error(errorData.error || "העלאה נכשלה");
     }
 
     const blob = await response.json();
@@ -70,57 +65,36 @@ export function ImageUploader({
     };
   };
 
-  const handleFiles = useCallback(
-    async (files: FileList) => {
+  const handleFile = useCallback(
+    async (file: File) => {
       setError(null);
-      const fileArray = Array.from(files);
 
-      if (uploadedImages.length + fileArray.length > maxFiles) {
-        setError(`Maximum ${maxFiles} files allowed`);
+      // Validate file
+      if (!acceptedTypes.includes(file.type)) {
+        setError(`סוג הקובץ ${file.type} אינו נתמך`);
         return;
       }
-
-      // Validate all files first
-      const validateFile = (file: File): string | null => {
-        if (!acceptedTypes.includes(file.type)) {
-          return `File type ${file.type} is not supported`;
-        }
-        if (file.size > maxSize * 1024 * 1024) {
-          return `File size must be less than ${maxSize}MB`;
-        }
-        return null;
-      };
-
-      for (const file of fileArray) {
-        const validationError = validateFile(file);
-        if (validationError) {
-          setError(validationError);
-          return;
-        }
+      if (file.size > maxSize * 1024 * 1024) {
+        setError(`גודל הקובץ חייב להיות פחות מ-${maxSize}MB`);
+        return;
       }
 
       setUploading(true);
       setUploadProgress(0);
 
       try {
-        const uploadPromises = fileArray.map(async (file, index) => {
-          const result = await uploadFile(file);
-          setUploadProgress(((index + 1) / fileArray.length) * 100);
-          return result;
-        });
-
-        const results = await Promise.all(uploadPromises);
-        const newImages = [...uploadedImages, ...results];
-        setUploadedImages(newImages);
-        onUpload?.(newImages);
+        const result = await uploadFile(file);
+        setUploadProgress(100);
+        setUploadedImage(result);
+        onUpload?.([result]); // Pass as array to maintain compatibility
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Upload failed");
+        setError(err instanceof Error ? err.message : "העלאה נכשלה");
       } finally {
         setUploading(false);
         setUploadProgress(0);
       }
     },
-    [uploadedImages, maxFiles, onUpload, acceptedTypes, maxSize]
+    [onUpload, acceptedTypes, maxSize]
   );
 
   const handleDrop = useCallback(
@@ -130,10 +104,10 @@ export function ImageUploader({
 
       const files = e.dataTransfer.files;
       if (files.length > 0) {
-        handleFiles(files);
+        handleFile(files[0]);
       }
     },
-    [handleFiles]
+    [handleFile]
   );
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
@@ -149,23 +123,22 @@ export function ImageUploader({
   const handleFileInput = useCallback(
     (e: React.ChangeEvent<HTMLInputElement>) => {
       const files = e.target.files;
-      if (files) {
-        handleFiles(files);
+      if (files && files.length > 0) {
+        handleFile(files[0]);
       }
     },
-    [handleFiles]
+    [handleFile]
   );
 
-  const removeImage = (index: number) => {
-    const newImages = uploadedImages.filter((_, i) => i !== index);
-    setUploadedImages(newImages);
-    onUpload?.(newImages);
+  const removeImage = () => {
+    setUploadedImage(null);
+    onUpload?.([]); // Pass empty array to maintain compatibility
   };
 
   const formatFileSize = (bytes: number) => {
-    if (bytes === 0) return "0 Bytes";
+    if (bytes === 0) return "0 בתים";
     const k = 1024;
-    const sizes = ["Bytes", "KB", "MB", "GB"];
+    const sizes = ["בתים", "KB", "MB", "GB"];
     const i = Math.floor(Math.log(bytes) / Math.log(k));
     return (
       Number.parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i]
@@ -173,7 +146,7 @@ export function ImageUploader({
   };
 
   return (
-    <div className="w-full max-w-4xl mx-auto space-y-6">
+    <div className="w-full max-w-2xl mx-auto space-y-6">
       {/* Upload Area */}
       <Card
         className={`transition-colors ${
@@ -197,37 +170,33 @@ export function ImageUploader({
 
             {uploading ? (
               <div className="space-y-2">
-                <p className="text-lg font-medium">Uploading images...</p>
+                <p className="text-lg font-medium">מעלה תמונה...</p>
                 <Progress
                   value={uploadProgress}
                   className="w-full max-w-xs mx-auto"
                 />
                 <p className="text-sm text-muted-foreground">
-                  {Math.round(uploadProgress)}% complete
+                  {Math.round(uploadProgress)}% הושלם
                 </p>
               </div>
             ) : (
               <>
                 <div className="space-y-2">
                   <p className="text-lg font-medium">
-                    Drag and drop images here, or click to select
+                    גרור ושחרר תמונה כאן, או לחץ לבחירה
                   </p>
                   <p className="text-sm text-muted-foreground">
-                    Supports JPEG, PNG, WebP, and GIF up to {maxSize}MB each
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    Maximum {maxFiles} files • {uploadedImages.length}/
-                    {maxFiles} uploaded
+                    תומך ב-JPEG, PNG, WebP ו-GIF עד {maxSize}MB
                   </p>
                 </div>
 
                 <Button
                   onClick={() => fileInputRef.current?.click()}
-                  disabled={uploadedImages.length >= maxFiles}
+                  disabled={!!uploadedImage}
                   variant="outline"
                 >
                   <ImageIcon className="mr-2 h-4 w-4" />
-                  Select Images
+                  בחר תמונה
                 </Button>
               </>
             )}
@@ -242,44 +211,40 @@ export function ImageUploader({
         </Alert>
       )}
 
-      {/* Uploaded Images Grid */}
-      {uploadedImages.length > 0 && (
+      {/* Uploaded Image */}
+      {uploadedImage && (
         <div className="space-y-4">
-          <h3 className="text-lg font-semibold">Uploaded Images</h3>
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-            {uploadedImages.map((image, index) => (
-              <Card key={index} className="overflow-hidden">
-                <div className="relative aspect-video">
-                  <Image
-                    src={image.url || "/placeholder.svg"}
-                    alt={image.filename}
-                    fill
-                    className="object-cover"
-                    sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  />
-                  <Button
-                    size="sm"
-                    variant="destructive"
-                    className="absolute top-2 right-2 h-8 w-8 p-0"
-                    onClick={() => removeImage(index)}
-                  >
-                    <X className="h-4 w-4" />
-                  </Button>
-                </div>
-                <CardContent className="p-3">
-                  <p
-                    className="text-sm font-medium truncate"
-                    title={image.filename}
-                  >
-                    {image.filename}
-                  </p>
-                  <p className="text-xs text-muted-foreground">
-                    {formatFileSize(image.size)}
-                  </p>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
+          <h3 className="text-lg font-semibold">התמונה שהועלתה</h3>
+          <Card className="overflow-hidden">
+            <div className="relative aspect-video">
+              <Image
+                src={uploadedImage.url || "/placeholder.svg"}
+                alt={uploadedImage.filename}
+                fill
+                className="object-cover"
+                sizes="(max-width: 768px) 100vw, 50vw"
+              />
+              <Button
+                size="sm"
+                variant="destructive"
+                className="absolute top-2 right-2 h-8 w-8 p-0"
+                onClick={removeImage}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            <CardContent className="p-3">
+              <p
+                className="text-sm font-medium truncate"
+                title={uploadedImage.filename}
+              >
+                {uploadedImage.filename}
+              </p>
+              <p className="text-xs text-muted-foreground">
+                {formatFileSize(uploadedImage.size)}
+              </p>
+            </CardContent>
+          </Card>
         </div>
       )}
 
@@ -287,7 +252,6 @@ export function ImageUploader({
       <input
         ref={fileInputRef}
         type="file"
-        multiple
         accept={acceptedTypes.join(",")}
         onChange={handleFileInput}
         className="hidden"
