@@ -12,18 +12,12 @@ interface Project {
   };
   technologies: string[];
   votes: number;
-
   createdAt: string;
   liveUrl?: string;
   githubUrl?: string;
   features?: string[];
   techDetails?: string;
   challenges?: string;
-  category?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
 }
 
 interface UserProjectsResponse {

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../db";
-import { projects, users, categories, votes } from "../../../../db/schema";
+import { projects, users, votes } from "../../../../db/schema";
 import { eq, desc, asc, like, and, gte, lt, sql } from "drizzle-orm";
 import { z } from "zod";
 
@@ -10,7 +10,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
-    const category = searchParams.get("category");
     const search = searchParams.get("search");
     const authorId = searchParams.get("authorId");
     const sortBy = searchParams.get("sortBy") || "createdAt";
@@ -33,9 +32,6 @@ export async function GET(request: NextRequest) {
 
     // Build where conditions
     const whereConditions = [];
-    if (category) {
-      whereConditions.push(eq(categories.slug, category));
-    }
     if (search) {
       whereConditions.push(like(projects.title, `%${search}%`));
     }
@@ -85,18 +81,12 @@ export async function GET(request: NextRequest) {
           name: users.name,
           avatar: users.avatar,
         },
-        category: {
-          id: categories.id,
-          name: categories.name,
-          slug: categories.slug,
-        },
         todayVotes: sql<number>`COALESCE(today_votes.count, 0)`.as(
           "todayVotes"
         ),
       })
       .from(projects)
       .leftJoin(users, eq(projects.authorId, users.id))
-      .leftJoin(categories, eq(projects.categoryId, categories.id))
       .leftJoin(
         db
           .select({
@@ -120,7 +110,6 @@ export async function GET(request: NextRequest) {
     const totalCount = await db
       .select({ count: projects.id })
       .from(projects)
-      .leftJoin(categories, eq(projects.categoryId, categories.id))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
     const total = totalCount.length;

@@ -1,7 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/hooks/use-toast";
-import { useCategories } from "@/hooks/use-categories";
 
 interface ProjectFormData {
   title: string;
@@ -11,7 +10,6 @@ interface ProjectFormData {
   liveUrl?: string;
   githubUrl?: string;
   technologies: string[];
-  category: string;
   features: string[];
   techDetails?: string;
   challenges?: string;
@@ -23,13 +21,7 @@ interface SubmitProjectResponse {
   error?: string;
 }
 
-async function submitProject(
-  data: ProjectFormData,
-  categories: any[]
-): Promise<any> {
-  // Find the category ID by slug
-  const category = categories.find((cat) => cat.slug === data.category);
-
+async function submitProject(data: ProjectFormData): Promise<any> {
   const response = await fetch("/api/projects", {
     method: "POST",
     headers: {
@@ -42,7 +34,6 @@ async function submitProject(
       liveUrl: data.liveUrl,
       githubUrl: data.githubUrl,
       technologies: data.technologies,
-      categoryId: category?.id,
       features: data.features.filter((f) => f.trim()), // Remove empty features
       techDetails: data.techDetails,
       challenges: data.challenges,
@@ -73,10 +64,9 @@ export function useSubmitProject() {
   const queryClient = useQueryClient();
   const router = useRouter();
   const { toast } = useToast();
-  const { data: categories = [] } = useCategories();
 
   return useMutation({
-    mutationFn: (data: ProjectFormData) => submitProject(data, categories),
+    mutationFn: submitProject,
     onSuccess: (data) => {
       // Invalidate and refetch projects list
       queryClient.invalidateQueries({ queryKey: ["projects"] });

@@ -1,6 +1,6 @@
 export const mockUsers = [
   {
-    id: "user_2zidnRey3XsxiGYwoinuOyqpVx2",
+    id: "user1",
     name: "שרה חן",
     avatar: "https://images.unsplash.com/photo-1494790108755-2616b612c757",
     bio: "מפתחת פול-סטק עם תשוקה לבינה מלאכותית וטכנולוגיות ווב מודרניות",
@@ -125,8 +125,6 @@ export const mockProjects = [
     },
     technologies: ["React", "TypeScript", "OpenAI API", "Tailwind CSS"],
     votes: 124,
-
-    category: "lovable",
     liveUrl: "https://ai-taskmanager.demo.com",
     githubUrl: "https://github.com/sarah/ai-taskmanager",
     timeAgo: "לפני שעתיים",
@@ -155,8 +153,6 @@ export const mockProjects = [
     },
     technologies: ["Next.js", "Socket.io", "Canvas API", "MongoDB"],
     votes: 89,
-
-    category: "cursor",
     liveUrl: "https://collab-board.demo.com",
     githubUrl: "https://github.com/mike/collab-board",
     timeAgo: "לפני 4 שעות",
@@ -184,8 +180,6 @@ export const mockProjects = [
     },
     technologies: ["Vue.js", "Firebase", "Cloudinary", "Express.js"],
     votes: 156,
-
-    category: "chef",
     liveUrl: "https://recipe-social.demo.com",
     githubUrl: "https://github.com/emma/recipe-social",
     timeAgo: "לפני 6 שעות",
@@ -212,8 +206,6 @@ export const mockProjects = [
     },
     technologies: ["React", "Chart.js", "CoinGecko API", "Material-UI"],
     votes: 203,
-
-    category: "convex",
     liveUrl: "https://crypto-tracker.demo.com",
     githubUrl: "https://github.com/alex/crypto-tracker",
     timeAgo: "לפני 8 שעות",
@@ -241,8 +233,6 @@ export const mockProjects = [
     },
     technologies: ["Svelte", "D3.js", "IndexedDB", "PWA"],
     votes: 78,
-
-    category: "bolt",
     liveUrl: "https://habit-tracker.demo.com",
     githubUrl: "https://github.com/lisa/habit-tracker",
     timeAgo: "לפני 12 שעות",
@@ -264,8 +254,6 @@ export const mockProjects = [
     },
     technologies: ["Python", "OpenAI API", "FastAPI", "React"],
     votes: 267,
-
-    category: "replit",
     liveUrl: "https://ai-codereview.demo.com",
     githubUrl: "https://github.com/david/ai-codereview",
     timeAgo: "לפני יום",

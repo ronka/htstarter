@@ -1,11 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../../db";
-import {
-  projects,
-  users,
-  categories,
-  dailyWinners,
-} from "../../../../db/schema";
+import { projects, users, dailyWinners } from "../../../../db/schema";
 import { eq, sql } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, isAuthorized } from "../../../../lib/auth";
@@ -21,7 +16,6 @@ const updateProjectSchema = z.object({
       message: "Image must be a valid URL or empty",
     }),
   technologies: z.array(z.string()),
-  categoryId: z.number(),
   liveUrl: z.string().url("Live URL must be a valid URL"),
   githubUrl: z
     .string()
@@ -86,16 +80,9 @@ export async function GET(
           followers: users.followers,
           following: users.following,
         },
-        category: {
-          id: categories.id,
-          name: categories.name,
-          slug: categories.slug,
-          description: categories.description,
-        },
       })
       .from(projects)
       .leftJoin(users, eq(projects.authorId, users.id))
-      .leftJoin(categories, eq(projects.categoryId, categories.id))
       .where(eq(projects.id, projectId))
       .limit(1);
 
@@ -255,22 +242,8 @@ export async function DELETE(
       );
     }
 
-    // Delete project
+    // Delete the project
     await db.delete(projects).where(eq(projects.id, projectId));
-
-    // Update user's project count
-    const [userData] = await db
-      .select({ projects: users.projects })
-      .from(users)
-      .where(eq(users.id, existingProject.authorId))
-      .limit(1);
-
-    if (userData) {
-      await db
-        .update(users)
-        .set({ projects: Math.max(0, userData.projects - 1) })
-        .where(eq(users.id, existingProject.authorId));
-    }
 
     return NextResponse.json({
       success: true,

@@ -31,15 +31,6 @@ export const users = pgTable("users", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
-// Categories table
-export const categories = pgTable("categories", {
-  id: serial("id").primaryKey(),
-  name: text("name").notNull().unique(),
-  slug: text("slug").notNull().unique(),
-  description: text("description"),
-  createdAt: timestamp("created_at").defaultNow().notNull(),
-});
-
 // Projects table
 export const projects = pgTable("projects", {
   id: serial("id").primaryKey(),
@@ -50,7 +41,6 @@ export const projects = pgTable("projects", {
     .notNull()
     .references(() => users.id, { onDelete: "cascade" }),
   technologies: jsonb("technologies").$type<string[]>(),
-  categoryId: integer("category_id").references(() => categories.id),
   liveUrl: text("live_url"),
   githubUrl: text("github_url"),
   votes: integer("votes").default(0),
@@ -137,17 +127,9 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
     fields: [projects.authorId],
     references: [users.id],
   }),
-  category: one(categories, {
-    fields: [projects.categoryId],
-    references: [categories.id],
-  }),
   votes: many(votes),
   comments: many(comments),
   dailyWinners: many(dailyWinners),
-}));
-
-export const categoriesRelations = relations(categories, ({ many }) => ({
-  projects: many(projects),
 }));
 
 export const votesRelations = relations(votes, ({ one }) => ({
@@ -182,9 +164,6 @@ export const dailyWinnersRelations = relations(dailyWinners, ({ one }) => ({
 // TypeScript types
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
-
-export type Category = typeof categories.$inferSelect;
-export type NewCategory = typeof categories.$inferInsert;
 
 export type Project = typeof projects.$inferSelect;
 export type NewProject = typeof projects.$inferInsert;

@@ -92,7 +92,6 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
             hasVoted={hasVoted}
             onVote={handleVote}
             isVoting={isVoting}
-            category={project.category}
             technologiesCount={project.technologies.length}
             dailyWinsCount={project.dailyWinsCount}
           />

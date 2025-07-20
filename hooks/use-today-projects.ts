@@ -19,11 +19,6 @@ interface Project {
   features?: string[];
   techDetails?: string;
   challenges?: string;
-  category?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
 }
 
 interface TodayProjectsResponse {
@@ -39,7 +34,6 @@ interface TodayProjectsResponse {
 }
 
 interface TodayProjectsParams {
-  category?: string;
   search?: string;
   page?: number;
   limit?: number;
@@ -52,7 +46,6 @@ async function fetchTodayProjects(
 ): Promise<TodayProjectsResponse> {
   const searchParams = new URLSearchParams();
 
-  if (params.category) searchParams.append("category", params.category);
   if (params.search) searchParams.append("search", params.search);
   if (params.page) searchParams.append("page", params.page.toString());
   if (params.limit) searchParams.append("limit", params.limit.toString());
@@ -80,7 +73,6 @@ export function useTodayProjects(params: TodayProjectsParams = {}) {
   return useQuery({
     queryKey: [
       "today-projects",
-      params.category,
       params.search,
       params.page,
       params.limit,

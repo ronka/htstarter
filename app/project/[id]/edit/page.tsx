@@ -79,7 +79,6 @@ export default function EditProjectPage() {
     liveUrl: project.liveUrl,
     githubUrl: project.githubUrl || "",
     technologies: project.technologies,
-    category: project.category.slug,
     features: project.features,
     techDetails: project.techDetails,
     challenges: project.challenges,

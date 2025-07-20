@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "../../../db";
-import { projects, users, categories } from "../../../db/schema";
+import { projects, users } from "../../../db/schema";
 import { eq, desc, asc, like, and } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth } from "../../../lib/auth";
@@ -11,7 +11,6 @@ const createProjectSchema = z.object({
   description: z.string().min(1, "Description is required").max(2000),
   image: z.string().url().optional(),
   technologies: z.array(z.string()).optional(),
-  categoryId: z.number().optional(),
   liveUrl: z.string().url().optional(),
   githubUrl: z.string().optional(),
   features: z.array(z.string()).optional(),
@@ -25,7 +24,6 @@ export async function GET(request: NextRequest) {
     const { searchParams } = new URL(request.url);
     const page = parseInt(searchParams.get("page") || "1");
     const limit = parseInt(searchParams.get("limit") || "10");
-    const category = searchParams.get("category");
     const search = searchParams.get("search");
     const authorId = searchParams.get("authorId");
     const sortBy = searchParams.get("sortBy") || "createdAt";
@@ -35,9 +33,6 @@ export async function GET(request: NextRequest) {
 
     // Build where conditions
     const whereConditions = [];
-    if (category) {
-      whereConditions.push(eq(categories.slug, category));
-    }
     if (search) {
       whereConditions.push(like(projects.title, `%${search}%`));
     }
@@ -63,7 +58,7 @@ export async function GET(request: NextRequest) {
             : desc(projects.createdAt);
     }
 
-    // Get projects with author and category info
+    // Get projects with author info
     const projectsData = await db
       .select({
         id: projects.id,
@@ -74,7 +69,6 @@ export async function GET(request: NextRequest) {
         liveUrl: projects.liveUrl,
         githubUrl: projects.githubUrl,
         votes: projects.votes,
-
         features: projects.features,
         techDetails: projects.techDetails,
         challenges: projects.challenges,
@@ -85,15 +79,9 @@ export async function GET(request: NextRequest) {
           name: users.name,
           avatar: users.avatar,
         },
-        category: {
-          id: categories.id,
-          name: categories.name,
-          slug: categories.slug,
-        },
       })
       .from(projects)
       .leftJoin(users, eq(projects.authorId, users.id))
-      .leftJoin(categories, eq(projects.categoryId, categories.id))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
       .orderBy(orderBy)
       .limit(limit)
@@ -103,7 +91,6 @@ export async function GET(request: NextRequest) {
     const totalCount = await db
       .select({ count: projects.id })
       .from(projects)
-      .leftJoin(categories, eq(projects.categoryId, categories.id))
       .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
     const total = totalCount.length;
@@ -144,7 +131,6 @@ export async function POST(request: NextRequest) {
         description: validatedData.description,
         image: validatedData.image,
         technologies: validatedData.technologies,
-        categoryId: validatedData.categoryId,
         liveUrl: validatedData.liveUrl,
         githubUrl: validatedData.githubUrl,
         features: validatedData.features,

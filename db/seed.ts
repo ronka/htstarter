@@ -1,5 +1,5 @@
 import { db } from "./index";
-import { users, categories, projects, dailyWinners } from "./schema";
+import { users, projects, dailyWinners } from "./schema";
 import { mockUsers, mockProjects } from "../data/mockData";
 
 async function seed() {
@@ -11,53 +11,6 @@ async function seed() {
     await db.delete(dailyWinners);
     await db.delete(projects);
     await db.delete(users);
-    await db.delete(categories);
-
-    // Seed categories
-    console.log("📂 Seeding categories...");
-    const categoryData = [
-      {
-        name: "Lovable",
-        slug: "lovable",
-        description: "Projects that make you fall in love with them",
-      },
-      {
-        name: "Cursor",
-        slug: "cursor",
-        description: "Projects built with Cursor IDE",
-      },
-      {
-        name: "Chef",
-        slug: "chef",
-        description: "Cooking and recipe related projects",
-      },
-      {
-        name: "Convex",
-        slug: "convex",
-        description: "Projects using Convex backend",
-      },
-      {
-        name: "Bolt",
-        slug: "bolt",
-        description: "Fast and efficient projects",
-      },
-      {
-        name: "Replit",
-        slug: "replit",
-        description: "Projects built on Replit",
-      },
-    ];
-
-    const insertedCategories = await db
-      .insert(categories)
-      .values(categoryData)
-      .returning();
-    console.log(`✅ Inserted ${insertedCategories.length} categories`);
-
-    // Create category map for easy lookup
-    const categoryMap = new Map(
-      insertedCategories.map((cat) => [cat.slug, cat.id])
-    );
 
     // Seed users
     console.log("👥 Seeding users...");
@@ -92,11 +45,9 @@ async function seed() {
       image: project.image,
       authorId: project.author.id,
       technologies: project.technologies,
-      categoryId: categoryMap.get(project.category),
       liveUrl: project.liveUrl,
       githubUrl: project.githubUrl,
       votes: project.votes,
-
       features: project.features,
       techDetails: project.techDetails,
       challenges: project.challenges,
@@ -157,7 +108,6 @@ async function seed() {
 
     console.log("🎉 Database seeding completed successfully!");
     console.log(`📊 Summary:`);
-    console.log(`   - ${insertedCategories.length} categories`);
     console.log(`   - ${insertedUsers.length} users`);
     console.log(`   - ${insertedProjects.length} projects`);
     console.log(`   - ${insertedDailyWinners.length} daily winners`);

@@ -19,11 +19,6 @@ interface Project {
   features?: string[];
   techDetails?: string;
   challenges?: string;
-  category?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
 }
 
 interface ProjectResponse {

@@ -2,8 +2,6 @@
 export type {
   User,
   NewUser,
-  Category,
-  NewCategory,
   Project,
   NewProject,
   Vote,
@@ -13,12 +11,11 @@ export type {
 } from "../db/schema";
 
 // Import types for use in interfaces
-import type { User, Project, Category, DailyWinner } from "../db/schema";
+import type { User, Project, DailyWinner } from "../db/schema";
 
 // Extended types for API responses
 export interface ProjectWithAuthor extends Project {
   author: User;
-  category?: Category;
   _count?: {
     votes: number;
   };
@@ -35,7 +32,6 @@ export interface UserWithStats extends User {
 export interface DailyWinnerWithProject extends DailyWinner {
   project: Project & {
     author: User;
-    category?: Category;
   };
 }
 

@@ -14,7 +14,7 @@ interface DailyWinnerCardProps {
 
 export const DailyWinnerCard = ({ winner }: DailyWinnerCardProps) => {
   const { project, winDate, voteCount } = winner;
-  const { title, description, image, author, category } = project;
+  const { title, description, image, author } = project;
 
   const handleCardClick = () => {
     // Navigation will be handled by the Link wrapper
@@ -79,11 +79,6 @@ export const DailyWinnerCard = ({ winner }: DailyWinnerCardProps) => {
 
           <div className="flex items-center justify-between text-sm text-gray-500 mb-3">
             <span>מאת {author.name}</span>
-            {category && (
-              <Badge variant="outline" className="text-xs">
-                {category.name}
-              </Badge>
-            )}
           </div>
 
           <div className="flex items-center justify-between text-sm">

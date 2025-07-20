@@ -1,12 +1,12 @@
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { X, Loader2 } from "lucide-react";
-import { toast } from "sonner";
-import { ImageUploader } from "@/components/ImageUploader";
+import { ImageUploader } from "./ImageUploader";
+import { useSubmitProject } from "@/hooks/use-submit-project";
 
 interface UploadedImage {
   url: string;
@@ -25,7 +25,6 @@ interface ProjectFormProps {
     liveUrl: string;
     githubUrl: string;
     technologies: string[];
-    category: string;
     features?: string[];
     techDetails?: string;
     challenges?: string;
@@ -39,138 +38,92 @@ const ProjectForm = ({
   initialData,
 }: ProjectFormProps) => {
   const [formData, setFormData] = useState({
-    title: initialData.title || "",
-    description: initialData.description || "",
-    image: initialData.image || "",
-    liveUrl: initialData.liveUrl || "",
-    githubUrl: initialData.githubUrl || "",
-    technologies: initialData.technologies?.join(", ") || "",
-    category: initialData.category || "lovable",
-    features: initialData.features?.join(", ") || "",
-    techDetails: initialData.techDetails || "",
-    challenges: initialData.challenges || "",
+    title: initialData?.title || "",
+    description: initialData?.description || "",
+    image: initialData?.image || "",
+    liveUrl: initialData?.liveUrl || "",
+    githubUrl: initialData?.githubUrl || "",
+    technologies: initialData?.technologies?.join(", ") || "",
+    features: initialData?.features?.join(", ") || "",
+    techDetails: initialData?.techDetails || "",
+    challenges: initialData?.challenges || "",
   });
 
-  const initialImage = initialData?.image
-    ? [
-        {
-          url: initialData.image,
-          filename: "existing-image",
-          size: 0,
-        },
-      ]
-    : [];
+  const [initialImage, setInitialImage] = useState<string | undefined>(
+    initialData?.image
+  );
 
-  const [uploadedImages, setUploadedImages] =
-    useState<UploadedImage[]>(initialImage);
-  const [isSubmitting, setIsSubmitting] = useState(false);
+  const submitProject = useSubmitProject();
+
+  const isSubmitting = submitProject.isPending;
 
   const handleImageUpload = (images: UploadedImage[]) => {
-    setUploadedImages(images);
-    // Set the first image URL as the main image
     if (images.length > 0) {
-      setFormData((prev) => ({
-        ...prev,
+      setFormData({
+        ...formData,
         image: images[0].url,
-      }));
-    } else {
-      setFormData((prev) => ({
-        ...prev,
-        image: "",
-      }));
+      });
     }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
-    if (isSubmitting) return;
+    if (mode === "edit" && projectId) {
+      // Handle edit mode
+      try {
+        const response = await fetch(`/api/projects/${projectId}`, {
+          method: "PUT",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            title: formData.title,
+            description: formData.description,
+            image: formData.image,
+            liveUrl: formData.liveUrl,
+            githubUrl: formData.githubUrl,
+            technologies: formData.technologies
+              .split(",")
+              .map((tech) => tech.trim())
+              .filter((tech) => tech.length > 0),
+            features: formData.features
+              .split(",")
+              .map((feature) => feature.trim())
+              .filter((feature) => feature.length > 0),
+            techDetails: formData.techDetails,
+            challenges: formData.challenges,
+          }),
+        });
 
-    // Validate that at least one image is uploaded
-    if (uploadedImages.length === 0) {
-      toast.error("אנא העלה לפחות תמונה אחת לפרויקט");
-      return;
-    }
+        if (!response.ok) {
+          throw new Error("Failed to update project");
+        }
 
-    setIsSubmitting(true);
-
-    try {
-      const technologiesArray = formData.technologies
-        .split(",")
-        .map((tech) => tech.trim())
-        .filter((tech) => tech.length > 0);
-
-      const featuresArray = formData.features
-        .split(",")
-        .map((feature) => feature.trim())
-        .filter((feature) => feature.length > 0);
-
-      const requestBody = {
+        onClose();
+      } catch (error) {
+        console.error("Error updating project:", error);
+      }
+    } else {
+      // Handle create mode
+      submitProject.mutate({
         title: formData.title,
         description: formData.description,
-        image: formData.image || "",
+        image: formData.image,
         liveUrl: formData.liveUrl,
-        githubUrl: formData.githubUrl || "",
-        technologies: technologiesArray,
-        categoryId: getCategoryId(formData.category),
-        features: featuresArray.length > 0 ? featuresArray : undefined,
-        techDetails: formData.techDetails || "",
-        challenges: formData.challenges || "",
-      };
-
-      const url =
-        mode === "edit" ? `/api/projects/${projectId}` : "/api/projects";
-      const method = mode === "edit" ? "PUT" : "POST";
-
-      console.log(`Submitting ${mode} request:`, { url, method, requestBody });
-
-      const response = await fetch(url, {
-        method,
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(requestBody),
+        githubUrl: formData.githubUrl,
+        technologies: formData.technologies
+          .split(",")
+          .map((tech) => tech.trim())
+          .filter((tech) => tech.length > 0),
+        features: formData.features
+          .split(",")
+          .map((feature) => feature.trim())
+          .filter((feature) => feature.length > 0),
+        techDetails: formData.techDetails,
+        challenges: formData.challenges,
       });
-
-      const data = await response.json();
-      console.log(`Response for ${mode}:`, { status: response.status, data });
-
-      if (response.ok && data.success) {
-        toast.success(
-          mode === "edit"
-            ? "Project updated successfully!"
-            : "Project submitted successfully!"
-        );
-        onClose();
-      } else {
-        const errorMessage =
-          data.error || data.details || `Failed to ${mode} project`;
-        console.error(`API Error for ${mode}:`, {
-          status: response.status,
-          data,
-        });
-        throw new Error(errorMessage);
-      }
-    } catch (error) {
-      console.error(`Error ${mode}ing project:`, error);
-      toast.error(
-        error instanceof Error ? error.message : `Failed to ${mode} project`
-      );
-    } finally {
-      setIsSubmitting(false);
     }
-  };
-
-  const getCategoryId = (categorySlug: string): number => {
-    const categoryMap: Record<string, number> = {
-      lovable: 13,
-      cursor: 14,
-      chef: 15,
-      convex: 16,
-      bolt: 17,
-      replit: 18,
-    };
-    return categoryMap[categorySlug] || 13;
   };
 
   const handleChange = (
@@ -183,15 +136,6 @@ const ProjectForm = ({
       [e.target.name]: e.target.value,
     });
   };
-
-  const categories = [
-    { value: "lovable", label: "💙 מקסים" },
-    { value: "cursor", label: "🖱️ קרסור" },
-    { value: "chef", label: "🧑‍🍳 שף" },
-    { value: "convex", label: "🟠 קונבקס" },
-    { value: "bolt", label: "⚡ בזק" },
-    { value: "replit", label: "🔄 רפליט" },
-  ];
 
   return (
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
@@ -237,7 +181,17 @@ const ProjectForm = ({
                 onUpload={handleImageUpload}
                 maxFiles={1}
                 maxSize={5}
-                initialImages={mode === "edit" && initialImage}
+                initialImages={
+                  mode === "edit" && initialImage
+                    ? [
+                        {
+                          url: initialImage,
+                          filename: "existing-image",
+                          size: 0,
+                        },
+                      ]
+                    : []
+                }
               />
             </div>
 
@@ -311,24 +265,6 @@ const ProjectForm = ({
                 placeholder="תאר את האתגרים שנתקלת בהם ואיך פתרת אותם..."
                 rows={3}
               />
-            </div>
-
-            <div>
-              <Label htmlFor="category">קטגוריה *</Label>
-              <select
-                id="category"
-                name="category"
-                value={formData.category}
-                onChange={handleChange}
-                className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                required
-              >
-                {categories.map((cat) => (
-                  <option key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </option>
-                ))}
-              </select>
             </div>
 
             <div className="flex gap-3 pt-4 flex-row-reverse">

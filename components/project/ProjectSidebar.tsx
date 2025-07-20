@@ -12,9 +12,6 @@ interface ProjectSidebarProps {
   hasVoted: boolean;
   onVote: () => void;
   isVoting: boolean;
-  category?: {
-    name: string;
-  };
   technologiesCount: number;
   dailyWinsCount: number;
 }
@@ -26,7 +23,6 @@ export const ProjectSidebar = ({
   hasVoted,
   onVote,
   isVoting,
-  category,
   technologiesCount,
   dailyWinsCount,
 }: ProjectSidebarProps) => {
@@ -39,7 +35,6 @@ export const ProjectSidebar = ({
         hasVoted={hasVoted}
         onVote={onVote}
         isVoting={isVoting}
-        category={category}
         technologiesCount={technologiesCount}
         dailyWinsCount={dailyWinsCount}
       />

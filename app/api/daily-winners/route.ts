@@ -1,12 +1,12 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/lib/db";
-import { dailyWinners, projects, users, categories } from "@/db/schema";
+import { dailyWinners, projects, users } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
 import type { DailyWinnerWithProject } from "@/types/database";
 
 export async function GET(request: NextRequest) {
   try {
-    // Fetch daily winners with project details, author, and category
+    // Fetch daily winners with project details and author
     const winners = await db
       .select({
         id: dailyWinners.id,
@@ -28,7 +28,6 @@ export async function GET(request: NextRequest) {
         projectCreatedAt: projects.createdAt,
         projectUpdatedAt: projects.updatedAt,
         projectAuthorId: projects.authorId,
-        projectCategoryId: projects.categoryId,
         authorId: users.id,
         authorName: users.name,
         authorAvatar: users.avatar,
@@ -45,16 +44,10 @@ export async function GET(request: NextRequest) {
         authorFollowing: users.following,
         authorCreatedAt: users.createdAt,
         authorUpdatedAt: users.updatedAt,
-        categoryId: categories.id,
-        categoryName: categories.name,
-        categorySlug: categories.slug,
-        categoryDescription: categories.description,
-        categoryCreatedAt: categories.createdAt,
       })
       .from(dailyWinners)
       .innerJoin(projects, eq(dailyWinners.projectId, projects.id))
       .innerJoin(users, eq(projects.authorId, users.id))
-      .leftJoin(categories, eq(projects.categoryId, categories.id))
       .orderBy(desc(dailyWinners.winDate));
 
     // Transform the data to match the expected interface
@@ -72,7 +65,6 @@ export async function GET(request: NextRequest) {
           image: winner.projectImage,
           authorId: winner.projectAuthorId,
           technologies: winner.projectTechnologies,
-          categoryId: winner.projectCategoryId,
           liveUrl: winner.projectLiveUrl,
           githubUrl: winner.projectGithubUrl,
           votes: winner.projectVotes,
@@ -99,15 +91,6 @@ export async function GET(request: NextRequest) {
             createdAt: winner.authorCreatedAt,
             updatedAt: winner.authorUpdatedAt,
           },
-          category: winner.categoryId
-            ? {
-                id: winner.categoryId,
-                name: winner.categoryName,
-                slug: winner.categorySlug,
-                description: winner.categoryDescription,
-                createdAt: winner.categoryCreatedAt,
-              }
-            : undefined,
         },
       })
     );

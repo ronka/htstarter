@@ -31,7 +31,6 @@ interface Project {
 
 interface ProjectListProps {
   initialProjects?: Project[];
-  category?: string;
   search?: string;
 }
 
@@ -136,16 +135,11 @@ const ProjectListItem = ({ project }: { project: Project }) => {
   );
 };
 
-const ProjectList = ({
-  initialProjects,
-  category,
-  search,
-}: ProjectListProps) => {
+const ProjectList = ({ initialProjects, search }: ProjectListProps) => {
   const [sortBy, setSortBy] = useState("createdAt");
   const [sortOrder, setSortOrder] = useState("desc");
 
   const { data, isLoading, error } = useTodayProjects({
-    category,
     search,
     sortBy,
     sortOrder,

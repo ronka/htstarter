@@ -5,21 +5,12 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Textarea } from "@/components/ui/textarea";
 import { Badge } from "@/components/ui/badge";
-import {
-  ArrowLeft,
-  Upload,
-  X,
-  Plus,
-  Eye,
-  Github,
-  ExternalLink,
-} from "lucide-react";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { X, Plus, Eye, Github, ExternalLink, ArrowLeft } from "lucide-react";
 import { useSubmitProject } from "@/hooks/use-submit-project";
-import { useCategories } from "@/hooks/use-categories";
 import { ImageUploader } from "@/components/ImageUploader";
 
 interface UploadedImage {
@@ -36,7 +27,6 @@ interface ProjectFormData {
   liveUrl: string;
   githubUrl: string;
   technologies: string[];
-  category: string;
   features: string[];
   techDetails: string;
   challenges: string;
@@ -46,8 +36,6 @@ export default function SubmitPage() {
   const router = useRouter();
   const { userId } = useAuth();
   const submitProjectMutation = useSubmitProject();
-  const { data: categories = [], isLoading: categoriesLoading } =
-    useCategories();
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
   const [formData, setFormData] = useState<ProjectFormData>({
@@ -58,37 +46,12 @@ export default function SubmitPage() {
     liveUrl: "",
     githubUrl: "",
     technologies: [],
-    category: "",
     features: [""],
     techDetails: "",
     challenges: "",
   });
 
   const [techInput, setTechInput] = useState("");
-
-  // Set default category when categories are loaded
-  useEffect(() => {
-    if (categories.length > 0 && !formData.category) {
-      setFormData((prev) => ({ ...prev, category: categories[0].slug }));
-    }
-  }, [categories, formData.category]);
-
-  // Helper function to get emoji for category
-  const getCategoryEmoji = (slug: string) => {
-    const emojiMap: Record<string, string> = {
-      chef: "🧑‍🍳",
-      convex: "🟠",
-      lovable: "💙",
-      tempo: "⏱️",
-      cursor: "🖱️",
-      bolt: "⚡",
-      replit: "🔄",
-      v0: "v0",
-      windsurf: "🏄",
-      base44: "🟧",
-    };
-    return emojiMap[slug] || "📁";
-  };
 
   const handleInputChange = (field: keyof ProjectFormData, value: string) => {
     setFormData((prev) => ({
@@ -333,30 +296,6 @@ export default function SubmitPage() {
                         maxFiles={1}
                         maxSize={5}
                       />
-                    </div>
-
-                    <div>
-                      <Label htmlFor="category">קטגוריה *</Label>
-                      <select
-                        id="category"
-                        value={formData.category}
-                        onChange={(e) =>
-                          handleInputChange("category", e.target.value)
-                        }
-                        className="w-full mt-1 px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
-                        disabled={categoriesLoading}
-                      >
-                        {categoriesLoading ? (
-                          <option>טוען קטגוריות...</option>
-                        ) : (
-                          categories.map((cat) => (
-                            <option key={cat.slug} value={cat.slug}>
-                              {getCategoryEmoji(cat.slug)} {cat.name} -{" "}
-                              {cat.description || ""}
-                            </option>
-                          ))
-                        )}
-                      </select>
                     </div>
                   </div>
                 </div>

@@ -12,18 +12,12 @@ interface Project {
   };
   technologies: string[];
   votes: number;
-
   createdAt: string;
   liveUrl?: string;
   githubUrl?: string;
   features?: string[];
   techDetails?: string;
   challenges?: string;
-  category?: {
-    id: number;
-    name: string;
-    slug: string;
-  };
 }
 
 interface ProjectsResponse {
@@ -39,7 +33,6 @@ interface ProjectsResponse {
 }
 
 interface ProjectsParams {
-  category?: string;
   search?: string;
   page?: number;
   limit?: number;
@@ -52,7 +45,6 @@ async function fetchProjects(
 ): Promise<ProjectsResponse> {
   const searchParams = new URLSearchParams();
 
-  if (params.category) searchParams.append("category", params.category);
   if (params.search) searchParams.append("search", params.search);
   if (params.page) searchParams.append("page", params.page.toString());
   if (params.limit) searchParams.append("limit", params.limit.toString());

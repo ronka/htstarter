@@ -3,8 +3,6 @@ export { db, testConnection } from "../db";
 export type {
   User,
   NewUser,
-  Category,
-  NewCategory,
   Project,
   NewProject,
   Vote,
@@ -14,7 +12,7 @@ export type {
 // Database utility functions
 export async function getProjectWithAuthor(projectId: number) {
   const { db } = await import("../db");
-  const { projects, users, categories } = await import("../db/schema");
+  const { projects, users } = await import("../db/schema");
   const { eq } = await import("drizzle-orm");
 
   const projectData = await db
@@ -48,16 +46,9 @@ export async function getProjectWithAuthor(projectId: number) {
         followers: users.followers,
         following: users.following,
       },
-      category: {
-        id: categories.id,
-        name: categories.name,
-        slug: categories.slug,
-        description: categories.description,
-      },
     })
     .from(projects)
     .leftJoin(users, eq(projects.authorId, users.id))
-    .leftJoin(categories, eq(projects.categoryId, categories.id))
     .where(eq(projects.id, projectId))
     .limit(1);
 
@@ -119,19 +110,17 @@ export async function getUserWithProjects(userId: string) {
 export async function getProjectsWithFilters(filters: {
   page?: number;
   limit?: number;
-  category?: string;
   search?: string;
   sortBy?: string;
   sortOrder?: string;
 }) {
   const { db } = await import("../db");
-  const { projects, users, categories } = await import("../db/schema");
+  const { projects, users } = await import("../db/schema");
   const { eq, desc, asc, like, and } = await import("drizzle-orm");
 
   const {
     page = 1,
     limit = 10,
-    category,
     search,
     sortBy = "createdAt",
     sortOrder = "desc",
@@ -141,9 +130,6 @@ export async function getProjectsWithFilters(filters: {
 
   // Build where conditions
   const whereConditions = [];
-  if (category) {
-    whereConditions.push(eq(categories.slug, category));
-  }
   if (search) {
     whereConditions.push(like(projects.title, `%${search}%`));
   }
@@ -166,7 +152,7 @@ export async function getProjectsWithFilters(filters: {
           : desc(projects.createdAt);
   }
 
-  // Get projects with author and category info
+  // Get projects with author info
   const projectsData = await db
     .select({
       id: projects.id,
@@ -187,15 +173,9 @@ export async function getProjectsWithFilters(filters: {
         name: users.name,
         avatar: users.avatar,
       },
-      category: {
-        id: categories.id,
-        name: categories.name,
-        slug: categories.slug,
-      },
     })
     .from(projects)
     .leftJoin(users, eq(projects.authorId, users.id))
-    .leftJoin(categories, eq(projects.categoryId, categories.id))
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
     .orderBy(orderBy)
     .limit(limit)
@@ -205,7 +185,6 @@ export async function getProjectsWithFilters(filters: {
   const totalCount = await db
     .select({ count: projects.id })
     .from(projects)
-    .leftJoin(categories, eq(projects.categoryId, categories.id))
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
   const total = totalCount.length;

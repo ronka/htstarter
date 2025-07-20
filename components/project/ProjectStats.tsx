@@ -1,5 +1,4 @@
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { VoteButton } from "@/components/ui/vote-button";
 import { VoteStatusMessage } from "@/components/ui/vote-status-message";
 import { VoteCountDisplay } from "@/components/ui/vote-count-display";
@@ -11,9 +10,6 @@ interface ProjectStatsProps {
   hasVoted: boolean;
   onVote: () => void;
   isVoting: boolean;
-  category?: {
-    name: string;
-  };
   technologiesCount: number;
   dailyWinsCount: number;
 }
@@ -24,7 +20,6 @@ export const ProjectStats = ({
   hasVoted,
   onVote,
   isVoting,
-  category,
   technologiesCount,
   dailyWinsCount,
 }: ProjectStatsProps) => {
@@ -82,10 +77,6 @@ export const ProjectStats = ({
         </div>
 
         <div className="border-t pt-3 space-y-3">
-          <div className="flex justify-between">
-            <span className="text-gray-600">קטגוריה</span>
-            <Badge variant="outline">{category?.name || "N/A"}</Badge>
-          </div>
           <div className="flex justify-between">
             <span className="text-gray-600">טכנולוגיות</span>
             <span className="font-semibold">{technologiesCount} כלים</span>
