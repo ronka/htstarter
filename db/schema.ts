@@ -104,6 +104,27 @@ export const comments = pgTable("comments", {
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });
 
+// Daily Winners table
+export const dailyWinners = pgTable(
+  "daily_winners",
+  {
+    id: serial("id").primaryKey(),
+    projectId: integer("project_id")
+      .notNull()
+      .references(() => projects.id, { onDelete: "cascade" }),
+    winDate: timestamp("win_date").notNull(),
+    voteCount: integer("vote_count").notNull(),
+    createdAt: timestamp("created_at").defaultNow().notNull(),
+  },
+  (table) => ({
+    winDateIdx: index("daily_winners_win_date_idx").on(table.winDate),
+    projectWinDateIdx: index("daily_winners_project_win_date_idx").on(
+      table.projectId,
+      table.winDate
+    ),
+  })
+);
+
 // Relations
 export const usersRelations = relations(users, ({ many }) => ({
   projects: many(projects),
@@ -122,6 +143,7 @@ export const projectsRelations = relations(projects, ({ one, many }) => ({
   }),
   votes: many(votes),
   comments: many(comments),
+  dailyWinners: many(dailyWinners),
 }));
 
 export const categoriesRelations = relations(categories, ({ many }) => ({
@@ -150,6 +172,13 @@ export const commentsRelations = relations(comments, ({ one }) => ({
   }),
 }));
 
+export const dailyWinnersRelations = relations(dailyWinners, ({ one }) => ({
+  project: one(projects, {
+    fields: [dailyWinners.projectId],
+    references: [projects.id],
+  }),
+}));
+
 // TypeScript types
 export type User = typeof users.$inferSelect;
 export type NewUser = typeof users.$inferInsert;
@@ -165,3 +194,6 @@ export type NewVote = typeof votes.$inferInsert;
 
 export type Comment = typeof comments.$inferSelect;
 export type NewComment = typeof comments.$inferInsert;
+
+export type DailyWinner = typeof dailyWinners.$inferSelect;
+export type NewDailyWinner = typeof dailyWinners.$inferInsert;

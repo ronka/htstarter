@@ -24,7 +24,7 @@ export const VoteCountDisplay = ({
         {dailyVotes} הצבעות היום
       </div>
       <div className={cn("text-sm text-gray-500", totalClassName)}>
-        {totalVotes} סה"כ הצבעות
+        {totalVotes} סה&ldquo;כ הצבעות
       </div>
     </div>
   );
