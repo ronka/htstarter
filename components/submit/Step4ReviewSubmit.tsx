@@ -2,6 +2,7 @@
 
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
+import { TechnologyBadge } from "@/components/ui/technology-badge";
 import { Eye, Github } from "lucide-react";
 import { UploadedImage, ProjectFormData } from "./types";
 
@@ -25,9 +26,7 @@ export const Step4ReviewSubmit = ({
             <p className="text-gray-600 text-sm mb-4">{formData.description}</p>
             <div className="flex flex-wrap gap-2 mb-4 flex-row-reverse">
               {formData.technologies.slice(0, 3).map((tech) => (
-                <Badge key={tech} variant="secondary">
-                  {tech}
-                </Badge>
+                <TechnologyBadge key={tech} technology={tech} />
               ))}
               {formData.technologies.length > 3 && (
                 <Badge variant="outline">

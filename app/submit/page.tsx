@@ -171,7 +171,7 @@ export default function SubmitPage() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {currentStep === 3 && (
+            {currentStep === 1 && (
               <Step1BasicInfo
                 formData={formData}
                 uploadedImages={uploadedImages}
@@ -188,7 +188,7 @@ export default function SubmitPage() {
               />
             )}
 
-            {currentStep === 1 && (
+            {currentStep === 3 && (
               <Step3ProjectInsights
                 formData={formData}
                 onInputChange={handleInputChange}

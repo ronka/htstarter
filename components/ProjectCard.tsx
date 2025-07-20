@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { Badge } from "@/components/ui/badge";
+import { TechnologyBadge } from "@/components/ui/technology-badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
 import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
@@ -88,9 +89,11 @@ const ProjectCard = ({
 
           <div className="flex flex-wrap gap-1 mb-3 justify-end">
             {technologies.slice(0, 3).map((tech) => (
-              <Badge key={tech} variant="secondary" className="text-xs">
-                {tech}
-              </Badge>
+              <TechnologyBadge
+                key={tech}
+                technology={tech}
+                className="text-xs"
+              />
             ))}
             {technologies.length > 3 && (
               <Badge variant="outline" className="text-xs">

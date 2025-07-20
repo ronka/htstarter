@@ -1,4 +1,4 @@
-import { Badge } from "@/components/ui/badge";
+import { TechnologyBadge } from "@/components/ui/technology-badge";
 import { Separator } from "@/components/ui/separator";
 import ReactMarkdown from "react-markdown";
 import { ProjectActions } from "./ProjectActions";
@@ -29,9 +29,7 @@ export const ProjectContent = ({
 
       <div className="flex flex-wrap gap-2 mb-6 flex-row-reverse">
         {technologies.map((tech) => (
-          <Badge key={tech} variant="secondary">
-            {tech}
-          </Badge>
+          <TechnologyBadge key={tech} technology={tech} />
         ))}
       </div>
 
