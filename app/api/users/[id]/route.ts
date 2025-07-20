@@ -65,7 +65,7 @@ export async function GET(
         image: projects.image,
         technologies: projects.technologies,
         votes: projects.votes,
-        comments: projects.comments,
+
         createdAt: projects.createdAt,
       })
       .from(projects)

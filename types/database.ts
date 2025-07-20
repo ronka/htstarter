@@ -8,12 +8,10 @@ export type {
   NewProject,
   Vote,
   NewVote,
-  Comment,
-  NewComment,
 } from "../db/schema";
 
 // Import types for use in interfaces
-import type { User, Project, Category, Comment } from "../db/schema";
+import type { User, Project, Category } from "../db/schema";
 
 // Extended types for API responses
 export interface ProjectWithAuthor extends Project {
@@ -21,7 +19,6 @@ export interface ProjectWithAuthor extends Project {
   category?: Category;
   _count?: {
     votes: number;
-    comments: number;
   };
 }
 
@@ -31,10 +28,6 @@ export interface UserWithStats extends User {
     followers: number;
     following: number;
   };
-}
-
-export interface CommentWithUser extends Comment {
-  user: User;
 }
 
 // API response types

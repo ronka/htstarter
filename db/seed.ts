@@ -95,7 +95,7 @@ async function seed() {
       liveUrl: project.liveUrl,
       githubUrl: project.githubUrl,
       votes: project.votes,
-      comments: project.comments,
+
       features: project.features,
       techDetails: project.techDetails,
       challenges: project.challenges,

@@ -74,7 +74,7 @@ export async function GET(request: NextRequest) {
         liveUrl: projects.liveUrl,
         githubUrl: projects.githubUrl,
         votes: projects.votes,
-        comments: projects.comments,
+
         features: projects.features,
         techDetails: projects.techDetails,
         challenges: projects.challenges,

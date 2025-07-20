@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { Button } from "@/components/ui/button";
-import { Heart, MessageCircle, GitFork, Loader2 } from "lucide-react";
+import { Heart, GitFork, Loader2 } from "lucide-react";
 import { useProjects } from "@/hooks/use-projects";
 import { useVote } from "@/hooks/use-vote";
 import { useState } from "react";
@@ -17,7 +17,6 @@ interface Project {
   };
   technologies: string[];
   votes: number;
-  comments: number;
   createdAt: string;
   liveUrl?: string;
   githubUrl?: string;
@@ -105,10 +104,6 @@ const ProjectListItem = ({ project }: { project: Project }) => {
                 day: "numeric",
               })}
             </span>
-            <div className="flex items-center gap-1">
-              <MessageCircle className="w-4 h-4" />
-              <span>{project.comments || 0}</span>
-            </div>
             <div className="flex items-center gap-1">
               <Heart
                 className={`w-4 h-4 ${

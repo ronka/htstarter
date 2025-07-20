@@ -38,7 +38,6 @@ export interface Project {
   };
   technologies: string[];
   votes: number;
-  comments: number;
   createdAt: string;
   liveUrl?: string;
   githubUrl?: string;

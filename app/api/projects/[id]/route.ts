@@ -55,7 +55,7 @@ export async function GET(
         liveUrl: projects.liveUrl,
         githubUrl: projects.githubUrl,
         votes: projects.votes,
-        comments: projects.comments,
+
         features: projects.features,
         techDetails: projects.techDetails,
         challenges: projects.challenges,

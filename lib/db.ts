@@ -9,8 +9,6 @@ export type {
   NewProject,
   Vote,
   NewVote,
-  Comment,
-  NewComment,
 } from "../db/schema";
 
 // Database utility functions
@@ -29,7 +27,6 @@ export async function getProjectWithAuthor(projectId: number) {
       liveUrl: projects.liveUrl,
       githubUrl: projects.githubUrl,
       votes: projects.votes,
-      comments: projects.comments,
       features: projects.features,
       techDetails: projects.techDetails,
       challenges: projects.challenges,
@@ -107,7 +104,6 @@ export async function getUserWithProjects(userId: string) {
       image: projects.image,
       technologies: projects.technologies,
       votes: projects.votes,
-      comments: projects.comments,
       createdAt: projects.createdAt,
     })
     .from(projects)
@@ -181,7 +177,6 @@ export async function getProjectsWithFilters(filters: {
       liveUrl: projects.liveUrl,
       githubUrl: projects.githubUrl,
       votes: projects.votes,
-      comments: projects.comments,
       features: projects.features,
       techDetails: projects.techDetails,
       challenges: projects.challenges,

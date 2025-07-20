@@ -125,7 +125,7 @@ export const mockProjects = [
     },
     technologies: ["React", "TypeScript", "OpenAI API", "Tailwind CSS"],
     votes: 124,
-    comments: 23,
+
     category: "lovable",
     liveUrl: "https://ai-taskmanager.demo.com",
     githubUrl: "https://github.com/sarah/ai-taskmanager",
@@ -155,7 +155,7 @@ export const mockProjects = [
     },
     technologies: ["Next.js", "Socket.io", "Canvas API", "MongoDB"],
     votes: 89,
-    comments: 15,
+
     category: "cursor",
     liveUrl: "https://collab-board.demo.com",
     githubUrl: "https://github.com/mike/collab-board",
@@ -184,7 +184,7 @@ export const mockProjects = [
     },
     technologies: ["Vue.js", "Firebase", "Cloudinary", "Express.js"],
     votes: 156,
-    comments: 31,
+
     category: "chef",
     liveUrl: "https://recipe-social.demo.com",
     githubUrl: "https://github.com/emma/recipe-social",
@@ -212,7 +212,7 @@ export const mockProjects = [
     },
     technologies: ["React", "Chart.js", "CoinGecko API", "Material-UI"],
     votes: 203,
-    comments: 42,
+
     category: "convex",
     liveUrl: "https://crypto-tracker.demo.com",
     githubUrl: "https://github.com/alex/crypto-tracker",
@@ -241,7 +241,7 @@ export const mockProjects = [
     },
     technologies: ["Svelte", "D3.js", "IndexedDB", "PWA"],
     votes: 78,
-    comments: 12,
+
     category: "bolt",
     liveUrl: "https://habit-tracker.demo.com",
     githubUrl: "https://github.com/lisa/habit-tracker",
@@ -264,7 +264,7 @@ export const mockProjects = [
     },
     technologies: ["Python", "OpenAI API", "FastAPI", "React"],
     votes: 267,
-    comments: 58,
+
     category: "replit",
     liveUrl: "https://ai-codereview.demo.com",
     githubUrl: "https://github.com/david/ai-codereview",
