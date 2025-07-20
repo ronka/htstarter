@@ -37,13 +37,38 @@ export const techOptions: TechnologyInfo[] = [
     color: "bg-yellow-100 text-yellow-800 border-yellow-200",
   },
   {
+    name: "Svelte",
+    emoji: "🟨",
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  },
+  {
     name: "Node.js",
     emoji: "🟢",
     color: "bg-green-100 text-green-800 border-green-200",
   },
   {
+    name: "Express.js",
+    emoji: "🟢",
+    color: "bg-green-100 text-green-800 border-green-200",
+  },
+  {
+    name: "Vue.js",
+    emoji: "✅",
+    color: "bg-green-100 text-green-800 border-green-200",
+  },
+  {
+    name: "Chart.js",
+    emoji: "📊",
+    color: "bg-green-100 text-green-800 border-green-200",
+  },
+  {
     name: "Python",
     emoji: "🐍",
+    color: "bg-blue-100 text-blue-800 border-blue-200",
+  },
+  {
+    name: "Cloudinary",
+    emoji: "☁️",
     color: "bg-blue-100 text-blue-800 border-blue-200",
   },
   {
