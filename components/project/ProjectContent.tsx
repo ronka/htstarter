@@ -2,6 +2,7 @@ import { TechnologyBadge } from "@/components/ui/technology-badge";
 import { Separator } from "@/components/ui/separator";
 import ReactMarkdown from "react-markdown";
 import { ProjectActions } from "./ProjectActions";
+import { Trophy } from "lucide-react";
 
 interface ProjectContentProps {
   title: string;
@@ -11,6 +12,7 @@ interface ProjectContentProps {
   githubUrl?: string;
   features?: string[];
   longDescription?: string;
+  dailyWinsCount?: number;
 }
 
 export const ProjectContent = ({
@@ -21,6 +23,7 @@ export const ProjectContent = ({
   githubUrl,
   features,
   longDescription,
+  dailyWinsCount = 0,
 }: ProjectContentProps) => {
   return (
     <>
@@ -32,6 +35,36 @@ export const ProjectContent = ({
           <TechnologyBadge key={tech} technology={tech} />
         ))}
       </div>
+
+      {/* Daily Wins Section */}
+      {dailyWinsCount > 0 && (
+        <div className="mb-6">
+          <div className="bg-gradient-to-r from-yellow-50 to-yellow-100 border-2 border-yellow-400 rounded-lg p-4 relative overflow-hidden">
+            {/* Gold gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-r from-yellow-100 to-yellow-50 opacity-30"></div>
+
+            <div className="relative z-10 flex items-center justify-between">
+              <div className="flex items-center gap-3">
+                <Trophy className="w-6 h-6 text-yellow-600" />
+                <div>
+                  <h3 className="text-lg font-semibold text-gray-900">
+                    ניצחונות יומיים
+                  </h3>
+                  <p className="text-sm text-gray-600">
+                    הפרויקט זכה במירב הקולות
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold text-yellow-600">
+                  {dailyWinsCount}
+                </span>
+                <span className="text-sm text-gray-600">פעמים</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
 
       <ProjectActions liveUrl={liveUrl} githubUrl={githubUrl} />
 

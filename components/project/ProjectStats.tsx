@@ -11,7 +11,6 @@ interface ProjectStatsProps {
   onVote: () => void;
   isVoting: boolean;
   technologiesCount: number;
-  dailyWinsCount: number;
 }
 
 export const ProjectStats = ({
@@ -21,7 +20,6 @@ export const ProjectStats = ({
   onVote,
   isVoting,
   technologiesCount,
-  dailyWinsCount,
 }: ProjectStatsProps) => {
   const { userId } = useAuth();
   const isAuthenticated = !!userId;
@@ -80,12 +78,6 @@ export const ProjectStats = ({
           <div className="flex justify-between">
             <span className="text-gray-600">טכנולוגיות</span>
             <span className="font-semibold">{technologiesCount} כלים</span>
-          </div>
-          <div className="flex justify-between">
-            <span className="text-gray-600">ניצחונות יומיים</span>
-            <span className="font-semibold text-green-600">
-              {dailyWinsCount} פעמים
-            </span>
           </div>
         </div>
       </CardContent>

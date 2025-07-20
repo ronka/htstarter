@@ -81,6 +81,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
               longDescription={project.longDescription}
               authorId={project.author.id}
               projectId={project.id.toString()}
+              dailyWinsCount={project.dailyWinsCount}
             />
           </div>
 
@@ -92,7 +93,6 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
             onVote={handleVote}
             isVoting={isVoting}
             technologiesCount={project.technologies.length}
-            dailyWinsCount={project.dailyWinsCount}
           />
         </div>
       </div>

@@ -22,6 +22,7 @@ interface ProjectMainProps {
   longDescription?: string;
   authorId: string;
   projectId: string;
+  dailyWinsCount?: number;
 }
 
 export const ProjectMain = ({
@@ -40,6 +41,7 @@ export const ProjectMain = ({
   longDescription,
   authorId,
   projectId,
+  dailyWinsCount = 0,
 }: ProjectMainProps) => {
   const { userId } = useAuth();
   const router = useRouter();
@@ -83,6 +85,7 @@ export const ProjectMain = ({
           githubUrl={githubUrl}
           features={features}
           longDescription={longDescription}
+          dailyWinsCount={dailyWinsCount}
         />
       </CardContent>
     </Card>

@@ -13,7 +13,6 @@ interface ProjectSidebarProps {
   onVote: () => void;
   isVoting: boolean;
   technologiesCount: number;
-  dailyWinsCount: number;
 }
 
 export const ProjectSidebar = ({
@@ -24,7 +23,6 @@ export const ProjectSidebar = ({
   onVote,
   isVoting,
   technologiesCount,
-  dailyWinsCount,
 }: ProjectSidebarProps) => {
   return (
     <div className="space-y-6">
@@ -36,7 +34,6 @@ export const ProjectSidebar = ({
         onVote={onVote}
         isVoting={isVoting}
         technologiesCount={technologiesCount}
-        dailyWinsCount={dailyWinsCount}
       />
     </div>
   );
