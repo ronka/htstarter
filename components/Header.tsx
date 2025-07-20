@@ -1,8 +1,10 @@
 "use client";
 
 import Link from "next/link";
+import { useState } from "react";
 import { useAuth } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
+import { Menu, X } from "lucide-react";
 import {
   SignInButton,
   SignOutButton,
@@ -12,6 +14,11 @@ import {
 
 const Header = () => {
   const { userId } = useAuth();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  const toggleMobileMenu = () => {
+    setIsMobileMenuOpen(!isMobileMenuOpen);
+  };
 
   return (
     <header className="bg-white border-b shadow-sm sticky top-0 z-50">
@@ -42,6 +49,12 @@ const Header = () => {
               פרויקטים
             </Link>
             <Link
+              href="/daily-winners"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              זוכים יומיים
+            </Link>
+            <Link
               href="/makers"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
@@ -58,26 +71,29 @@ const Header = () => {
           <div className="flex items-center gap-3">
             <SignedOut>
               <SignInButton>
-                <Button variant="outline" size="sm">
+                <Button variant="outline" size="sm" className="hidden md:flex">
                   התחבר
                 </Button>
               </SignInButton>
             </SignedOut>
             <SignedIn>
               {userId && (
-                <Link href={`/profile/${userId}/edit`}>
+                <Link
+                  href={`/profile/${userId}/edit`}
+                  className="hidden md:block"
+                >
                   <Button variant="outline" size="sm">
                     הפרופיל שלי
                   </Button>
                 </Link>
               )}
               <SignOutButton>
-                <Button variant="ghost" size="sm">
+                <Button variant="ghost" size="sm" className="hidden md:flex">
                   התנתק
                 </Button>
               </SignOutButton>
             </SignedIn>
-            <Link href="/submit">
+            <Link href="/submit" className="hidden md:block">
               <Button
                 size="sm"
                 className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
@@ -85,8 +101,102 @@ const Header = () => {
                 שלח פרויקט
               </Button>
             </Link>
+
+            {/* Mobile menu button */}
+            <Button
+              variant="ghost"
+              size="sm"
+              className="md:hidden"
+              onClick={toggleMobileMenu}
+              aria-label="Toggle mobile menu"
+            >
+              {isMobileMenuOpen ? (
+                <X className="h-5 w-5" />
+              ) : (
+                <Menu className="h-5 w-5" />
+              )}
+            </Button>
           </div>
         </div>
+
+        {/* Mobile menu */}
+        {isMobileMenuOpen && (
+          <div className="md:hidden border-t bg-white">
+            <nav className="flex flex-col py-4 space-y-2">
+              <Link
+                href="/"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                פרויקטים
+              </Link>
+              <Link
+                href="/daily-winners"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                זוכים יומיים
+              </Link>
+              <Link
+                href="/makers"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                יוצרים
+              </Link>
+              <Link
+                href="/about"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                אודות
+              </Link>
+              <div className="border-t pt-2 mt-2">
+                <SignedOut>
+                  <SignInButton>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="w-full justify-center"
+                    >
+                      התחבר
+                    </Button>
+                  </SignInButton>
+                </SignedOut>
+                <SignedIn>
+                  {userId && (
+                    <Link href={`/profile/${userId}/edit`} className="block">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        className="w-full justify-center mb-2"
+                      >
+                        הפרופיל שלי
+                      </Button>
+                    </Link>
+                  )}
+                  <SignOutButton>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="w-full justify-center mb-2"
+                    >
+                      התנתק
+                    </Button>
+                  </SignOutButton>
+                  <Link href="/submit" className="block">
+                    <Button
+                      size="sm"
+                      className="w-full justify-center bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700"
+                    >
+                      שלח פרויקט
+                    </Button>
+                  </Link>
+                </SignedIn>
+              </div>
+            </nav>
+          </div>
+        )}
       </div>
     </header>
   );
