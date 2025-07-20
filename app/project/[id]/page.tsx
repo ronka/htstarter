@@ -78,8 +78,7 @@ const ProjectDetailClient = ({ id }: ProjectDetailClientProps) => {
               liveUrl={project.liveUrl}
               githubUrl={project.githubUrl}
               features={project.features}
-              techDetails={project.techDetails}
-              challenges={project.challenges}
+              longDescription={project.longDescription}
               authorId={project.author.id}
               projectId={project.id.toString()}
             />

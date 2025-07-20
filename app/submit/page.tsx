@@ -31,8 +31,6 @@ export default function SubmitPage() {
     githubUrl: "",
     technologies: [],
     features: [""],
-    techDetails: "",
-    challenges: "",
   });
 
   const handleInputChange = (field: keyof ProjectFormData, value: string) => {
@@ -77,7 +75,7 @@ export default function SubmitPage() {
           formData.features.some((f) => f.trim())
         );
       case 3:
-        return formData.techDetails.trim() || formData.challenges.trim();
+        return formData.longDescription.trim();
       default:
         return true;
     }
@@ -173,7 +171,7 @@ export default function SubmitPage() {
           </CardHeader>
 
           <CardContent className="space-y-6">
-            {currentStep === 1 && (
+            {currentStep === 3 && (
               <Step1BasicInfo
                 formData={formData}
                 uploadedImages={uploadedImages}
@@ -190,7 +188,7 @@ export default function SubmitPage() {
               />
             )}
 
-            {currentStep === 3 && (
+            {currentStep === 1 && (
               <Step3ProjectInsights
                 formData={formData}
                 onInputChange={handleInputChange}

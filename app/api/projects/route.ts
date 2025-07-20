@@ -14,8 +14,7 @@ const createProjectSchema = z.object({
   liveUrl: z.string().url().optional(),
   githubUrl: z.string().optional(),
   features: z.array(z.string()).optional(),
-  techDetails: z.string().optional(),
-  challenges: z.string().optional(),
+  longDescription: z.string().optional(),
 });
 
 // GET /api/projects
@@ -70,8 +69,7 @@ export async function GET(request: NextRequest) {
         githubUrl: projects.githubUrl,
         votes: projects.votes,
         features: projects.features,
-        techDetails: projects.techDetails,
-        challenges: projects.challenges,
+        longDescription: projects.longDescription,
         createdAt: projects.createdAt,
         updatedAt: projects.updatedAt,
         author: {
@@ -134,8 +132,7 @@ export async function POST(request: NextRequest) {
         liveUrl: validatedData.liveUrl,
         githubUrl: validatedData.githubUrl,
         features: validatedData.features,
-        techDetails: validatedData.techDetails,
-        challenges: validatedData.challenges,
+        longDescription: validatedData.longDescription,
         authorId: user.id,
       })
       .returning();

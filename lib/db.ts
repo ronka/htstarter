@@ -26,8 +26,7 @@ export async function getProjectWithAuthor(projectId: number) {
       githubUrl: projects.githubUrl,
       votes: projects.votes,
       features: projects.features,
-      techDetails: projects.techDetails,
-      challenges: projects.challenges,
+      longDescription: projects.longDescription,
       createdAt: projects.createdAt,
       updatedAt: projects.updatedAt,
       author: {
@@ -164,8 +163,7 @@ export async function getProjectsWithFilters(filters: {
       githubUrl: projects.githubUrl,
       votes: projects.votes,
       features: projects.features,
-      techDetails: projects.techDetails,
-      challenges: projects.challenges,
+      longDescription: projects.longDescription,
       createdAt: projects.createdAt,
       updatedAt: projects.updatedAt,
       author: {

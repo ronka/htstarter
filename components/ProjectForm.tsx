@@ -26,8 +26,7 @@ interface ProjectFormProps {
     githubUrl: string;
     technologies: string[];
     features?: string[];
-    techDetails?: string;
-    challenges?: string;
+    longDescription?: string;
   };
 }
 
@@ -45,8 +44,7 @@ const ProjectForm = ({
     githubUrl: initialData?.githubUrl || "",
     technologies: initialData?.technologies?.join(", ") || "",
     features: initialData?.features?.join(", ") || "",
-    techDetails: initialData?.techDetails || "",
-    challenges: initialData?.challenges || "",
+    longDescription: initialData?.longDescription || "",
   });
 
   const [initialImage, setInitialImage] = useState<string | undefined>(
@@ -91,8 +89,7 @@ const ProjectForm = ({
               .split(",")
               .map((feature) => feature.trim())
               .filter((feature) => feature.length > 0),
-            techDetails: formData.techDetails,
-            challenges: formData.challenges,
+            longDescription: formData.longDescription,
           }),
         });
 
@@ -120,8 +117,7 @@ const ProjectForm = ({
           .split(",")
           .map((feature) => feature.trim())
           .filter((feature) => feature.length > 0),
-        techDetails: formData.techDetails,
-        challenges: formData.challenges,
+        longDescription: formData.longDescription,
       });
     }
   };
@@ -244,25 +240,13 @@ const ProjectForm = ({
             </div>
 
             <div>
-              <Label htmlFor="techDetails">פרטים טכניים</Label>
+              <Label htmlFor="longDescription">תיאור מפורט</Label>
               <Textarea
-                id="techDetails"
-                name="techDetails"
-                value={formData.techDetails}
+                id="longDescription"
+                name="longDescription"
+                value={formData.longDescription}
                 onChange={handleChange}
                 placeholder="תאר את הפרטים הטכניים של הפרויקט..."
-                rows={3}
-              />
-            </div>
-
-            <div>
-              <Label htmlFor="challenges">אתגרים ופתרונות</Label>
-              <Textarea
-                id="challenges"
-                name="challenges"
-                value={formData.challenges}
-                onChange={handleChange}
-                placeholder="תאר את האתגרים שנתקלת בהם ואיך פתרת אותם..."
                 rows={3}
               />
             </div>

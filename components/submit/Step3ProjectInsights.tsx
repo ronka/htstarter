@@ -14,30 +14,19 @@ export const Step3ProjectInsights = ({
   onInputChange,
 }: Step3ProjectInsightsProps) => {
   return (
-    <>
-      <div>
-        <Label htmlFor="techDetails">יישום טכני</Label>
-        <Textarea
-          id="techDetails"
-          value={formData.techDetails}
-          onChange={(e) => onInputChange("techDetails", e.target.value)}
-          placeholder="תאר את האדריכלות הטכנית, הספריות העיקריות ופרטי היישום..."
-          rows={5}
-          className="mt-1"
-        />
-      </div>
-
-      <div>
-        <Label htmlFor="challenges">אתגרים ופתרונות</Label>
-        <Textarea
-          id="challenges"
-          value={formData.challenges}
-          onChange={(e) => onInputChange("challenges", e.target.value)}
-          placeholder="מה היו האתגרים העיקריים שעמדת בפניהם ואיך פתרת אותם?"
-          rows={5}
-          className="mt-1"
-        />
-      </div>
-    </>
+    <div>
+      <Label htmlFor="longDescription">תיאור מפורט של הפרויקט</Label>
+      <Textarea
+        id="longDescription"
+        value={formData.longDescription}
+        onChange={(e) => onInputChange("longDescription", e.target.value)}
+        placeholder="תאר את הפרויקט בפירוט, כולל האדריכלות הטכנית, האתגרים שעמדת בפניהם, הפתרונות שיישמת, וכל פרט נוסף שיכול לעזור להבין את הפרויקט טוב יותר. תוכל להשתמש ב-Markdown לעיצוב הטקסט."
+        rows={8}
+        className="mt-1"
+      />
+      <p className="text-sm text-gray-500 mt-2">
+        תוכל להשתמש ב-Markdown לעיצוב הטקסט (כותרות, רשימות, קוד, וכו')
+      </p>
+    </div>
   );
 };

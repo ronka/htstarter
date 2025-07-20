@@ -72,8 +72,7 @@ export async function GET(request: NextRequest) {
         githubUrl: projects.githubUrl,
         votes: projects.votes, // Keep original votes for backward compatibility
         features: projects.features,
-        techDetails: projects.techDetails,
-        challenges: projects.challenges,
+        longDescription: projects.longDescription,
         createdAt: projects.createdAt,
         updatedAt: projects.updatedAt,
         author: {

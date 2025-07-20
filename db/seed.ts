@@ -49,8 +49,7 @@ async function seed() {
       githubUrl: project.githubUrl,
       votes: project.votes,
       features: project.features,
-      techDetails: project.techDetails,
-      challenges: project.challenges,
+      longDescription: project.longDescription,
     }));
 
     const insertedProjects = await db

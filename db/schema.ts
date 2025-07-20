@@ -45,8 +45,7 @@ export const projects = pgTable("projects", {
   githubUrl: text("github_url"),
   votes: integer("votes").default(0),
   features: jsonb("features").$type<string[]>(),
-  techDetails: text("tech_details"),
-  challenges: text("challenges"),
+  longDescription: text("long_description"),
   createdAt: timestamp("created_at").defaultNow().notNull(),
   updatedAt: timestamp("updated_at").defaultNow().notNull(),
 });

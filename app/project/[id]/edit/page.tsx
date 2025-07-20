@@ -80,8 +80,7 @@ export default function EditProjectPage() {
     githubUrl: project.githubUrl || "",
     technologies: project.technologies,
     features: project.features,
-    techDetails: project.techDetails,
-    challenges: project.challenges,
+    longDescription: project.longDescription,
   };
 
   return (

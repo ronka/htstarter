@@ -16,8 +16,7 @@ interface Project {
   liveUrl?: string;
   githubUrl?: string;
   features?: string[];
-  techDetails?: string;
-  challenges?: string;
+  longDescription?: string;
 }
 
 interface ProjectsResponse {

@@ -36,6 +36,13 @@
       "when": 1753029293906,
       "tag": "0004_wet_inertia",
       "breakpoints": true
+    },
+    {
+      "idx": 5,
+      "version": "7",
+      "when": 1753031791733,
+      "tag": "0005_tiny_killmonger",
+      "breakpoints": true
     }
   ]
 }

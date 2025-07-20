@@ -19,8 +19,7 @@ interface ProjectMainProps {
   liveUrl?: string;
   githubUrl?: string;
   features?: string[];
-  techDetails?: string;
-  challenges?: string;
+  longDescription?: string;
   authorId: string;
   projectId: string;
 }
@@ -38,8 +37,7 @@ export const ProjectMain = ({
   liveUrl,
   githubUrl,
   features,
-  techDetails,
-  challenges,
+  longDescription,
   authorId,
   projectId,
 }: ProjectMainProps) => {
@@ -84,8 +82,7 @@ export const ProjectMain = ({
           liveUrl={liveUrl}
           githubUrl={githubUrl}
           features={features}
-          techDetails={techDetails}
-          challenges={challenges}
+          longDescription={longDescription}
         />
       </CardContent>
     </Card>

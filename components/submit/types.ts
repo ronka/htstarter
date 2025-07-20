@@ -13,6 +13,4 @@ export interface ProjectFormData {
   githubUrl: string;
   technologies: string[];
   features: string[];
-  techDetails: string;
-  challenges: string;
 }

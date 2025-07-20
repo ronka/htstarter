@@ -11,8 +11,6 @@ interface ProjectFormData {
   githubUrl?: string;
   technologies: string[];
   features: string[];
-  techDetails?: string;
-  challenges?: string;
 }
 
 interface SubmitProjectResponse {
@@ -35,8 +33,7 @@ async function submitProject(data: ProjectFormData): Promise<any> {
       githubUrl: data.githubUrl,
       technologies: data.technologies,
       features: data.features.filter((f) => f.trim()), // Remove empty features
-      techDetails: data.techDetails,
-      challenges: data.challenges,
+      longDescription: data.longDescription,
     }),
   });
 

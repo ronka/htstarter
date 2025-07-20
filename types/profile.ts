@@ -42,8 +42,7 @@ export interface Project {
   liveUrl?: string;
   githubUrl?: string;
   features?: string[];
-  techDetails?: string;
-  challenges?: string;
+  longDescription?: string;
   category?: {
     id: number;
     name: string;

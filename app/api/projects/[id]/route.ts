@@ -24,8 +24,7 @@ const updateProjectSchema = z.object({
       message: "GitHub URL must be a valid URL or empty",
     }),
   features: z.array(z.string()).optional(),
-  techDetails: z.string().optional(),
-  challenges: z.string().optional(),
+  longDescription: z.string().optional(),
 });
 
 // GET /api/projects/[id]
@@ -55,8 +54,7 @@ export async function GET(
         githubUrl: projects.githubUrl,
         votes: projects.votes,
         features: projects.features,
-        techDetails: projects.techDetails,
-        challenges: projects.challenges,
+        longDescription: projects.longDescription,
         createdAt: projects.createdAt,
         updatedAt: projects.updatedAt,
         dailyWinsCount: sql<number>`(
