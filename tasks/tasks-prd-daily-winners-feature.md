@@ -52,11 +52,11 @@
   - [x] 4.2 Add appropriate icon for daily winners in navigation
   - [x] 4.3 Ensure navigation link is properly styled and accessible
   - [x] 4.4 Test navigation functionality across different screen sizes
-- [ ] 5.0 Data Fetching and State Management
-  - [ ] 5.1 Create hooks/use-daily-winners.ts custom hook
-  - [ ] 5.2 Implement React Query for data fetching and caching
-  - [ ] 5.3 Add loading, error, and success states to the hook
-  - [ ] 5.4 Integrate the hook with the daily winners page components
-  - [ ] 5.5 Add proper error boundaries for failed data fetching
-  - [ ] 5.6 Implement data refresh functionality if needed
-  - [ ] 5.7 Test data fetching with various scenarios (loading, error, empty)
+- [x] 5.0 Data Fetching and State Management
+  - [x] 5.1 Create hooks/use-daily-winners.ts custom hook
+  - [x] 5.2 Implement React Query for data fetching and caching
+  - [x] 5.3 Add loading, error, and success states to the hook
+  - [x] 5.4 Integrate the hook with the daily winners page components
+  - [x] 5.5 Add proper error boundaries for failed data fetching
+  - [x] 5.6 Implement data refresh functionality if needed
+  - [x] 5.7 Test data fetching with various scenarios (loading, error, empty)
