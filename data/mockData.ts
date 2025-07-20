@@ -1,6 +1,6 @@
 export const mockUsers = [
   {
-    id: "user1",
+    id: "user_2zidnRey3XsxiGYwoinuOyqpVx2",
     name: "שרה חן",
     avatar: "https://images.unsplash.com/photo-1494790108755-2616b612c757",
     bio: "מפתחת פול-סטק עם תשוקה לבינה מלאכותית וטכנולוגיות ווב מודרניות",
