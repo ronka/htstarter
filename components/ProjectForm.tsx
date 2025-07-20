@@ -68,17 +68,6 @@ const ProjectForm = ({
         techDetails: initialData.techDetails || "",
         challenges: initialData.challenges || "",
       });
-
-      // If editing and there's an existing image, add it to uploaded images
-      if (initialData.image) {
-        setUploadedImages([
-          {
-            url: initialData.image,
-            filename: "existing-image",
-            size: 0,
-          },
-        ]);
-      }
     }
   }, [mode, initialData]);
 
@@ -256,6 +245,17 @@ const ProjectForm = ({
                 onUpload={handleImageUpload}
                 maxFiles={1}
                 maxSize={5}
+                initialImages={
+                  mode === "edit" && initialData?.image
+                    ? [
+                        {
+                          url: initialData.image,
+                          filename: "existing-image",
+                          size: 0,
+                        },
+                      ]
+                    : []
+                }
               />
             </div>
 

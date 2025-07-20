@@ -2,7 +2,7 @@
 
 import type React from "react";
 
-import { useState, useCallback, useRef } from "react";
+import { useState, useCallback, useRef, useEffect } from "react";
 import { Upload, X, ImageIcon, Loader2 } from "lucide-react";
 import Image from "next/image";
 import { Button } from "@/components/ui/button";
@@ -21,6 +21,7 @@ interface ImageUploaderProps {
   maxFiles?: number;
   maxSize?: number; // in MB
   acceptedTypes?: string[];
+  initialImages?: UploadedImage[];
 }
 
 export function ImageUploader({
@@ -28,23 +29,21 @@ export function ImageUploader({
   maxFiles = 5,
   maxSize = 10,
   acceptedTypes = ["image/jpeg", "image/png", "image/webp", "image/gif"],
+  initialImages = [],
 }: ImageUploaderProps) {
   const [isDragOver, setIsDragOver] = useState(false);
-  const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
+  const [uploadedImages, setUploadedImages] =
+    useState<UploadedImage[]>(initialImages);
   const [uploading, setUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const [error, setError] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const validateFile = (file: File): string | null => {
-    if (!acceptedTypes.includes(file.type)) {
-      return `File type ${file.type} is not supported`;
+  useEffect(() => {
+    if (initialImages.length > 0 && onUpload) {
+      onUpload(initialImages);
     }
-    if (file.size > maxSize * 1024 * 1024) {
-      return `File size must be less than ${maxSize}MB`;
-    }
-    return null;
-  };
+  }, [initialImages, onUpload]);
 
   const uploadFile = async (file: File): Promise<UploadedImage> => {
     const formData = new FormData();
@@ -82,6 +81,16 @@ export function ImageUploader({
       }
 
       // Validate all files first
+      const validateFile = (file: File): string | null => {
+        if (!acceptedTypes.includes(file.type)) {
+          return `File type ${file.type} is not supported`;
+        }
+        if (file.size > maxSize * 1024 * 1024) {
+          return `File size must be less than ${maxSize}MB`;
+        }
+        return null;
+      };
+
       for (const file of fileArray) {
         const validationError = validateFile(file);
         if (validationError) {
@@ -111,7 +120,7 @@ export function ImageUploader({
         setUploadProgress(0);
       }
     },
-    [uploadedImages, maxFiles, onUpload]
+    [uploadedImages, maxFiles, onUpload, acceptedTypes, maxSize]
   );
 
   const handleDrop = useCallback(
