@@ -19,17 +19,11 @@ import {
 } from "@/components/ui/select";
 import { ArrowLeft, X, Plus } from "lucide-react";
 import { useUpdateUserProfile } from "@/hooks/use-update-user-profile";
-
-interface Experience {
-  title: string;
-  company: string;
-  startMonth: string;
-  startYear: string;
-  endMonth: string;
-  endYear: string;
-  isCurrentlyWorking: boolean;
-  description: string;
-}
+import {
+  AddExperienceForm,
+  Experience,
+} from "@/components/profile/AddExperienceForm";
+import { ExperienceTimeline } from "@/components/profile/ExperienceTimeline";
 
 // This is a placeholder for the actual user profile type
 interface UserProfile {
@@ -165,6 +159,25 @@ export function EditProfileForm({
       ...prev,
       [field]: value,
     }));
+  };
+
+  const handleMoveExperienceUp = (index: number) => {
+    if (index <= 0) return;
+    setFormData((prev) => {
+      const newExp = [...prev.experience];
+      [newExp[index - 1], newExp[index]] = [newExp[index], newExp[index - 1]];
+      return { ...prev, experience: newExp };
+    });
+  };
+
+  const handleMoveExperienceDown = (index: number) => {
+    setFormData((prev) => {
+      const newExp = [...prev.experience];
+      if (index < newExp.length - 1) {
+        [newExp[index], newExp[index + 1]] = [newExp[index + 1], newExp[index]];
+      }
+      return { ...prev, experience: newExp };
+    });
   };
 
   const handleSubmit = (e: React.FormEvent) => {
@@ -353,202 +366,29 @@ export function EditProfileForm({
                 </h3>
 
                 {/* Experience Timeline Display */}
-                {formData.experience.length > 0 && (
-                  <div className="space-y-6">
-                    <div className="relative">
-                      {/* Timeline line */}
-                      <div className="absolute right-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
-
-                      {formData.experience.map((exp, index) => (
-                        <div key={index} className="relative pr-12 pb-6">
-                          {/* Timeline dot */}
-                          <div className="absolute right-2 top-2 w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-sm"></div>
-
-                          <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
-                            <div className="flex justify-between items-start mb-2">
-                              <h4 className="font-semibold text-gray-900">
-                                {exp.title}
-                              </h4>
-                              <button
-                                type="button"
-                                onClick={() => handleRemoveExperience(index)}
-                                className="text-gray-400 hover:text-red-500 transition-colors"
-                              >
-                                <X className="w-4 h-4" />
-                              </button>
-                            </div>
-                            <p className="text-blue-600 text-sm mb-1">
-                              {exp.company}
-                            </p>
-                            <p className="text-gray-500 text-sm mb-2">
-                              {formatExperienceDuration(exp)}
-                            </p>
-                            <p className="text-gray-700 text-sm">
-                              {exp.description}
-                            </p>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
+                <ExperienceTimeline
+                  experiences={formData.experience}
+                  onRemove={handleRemoveExperience}
+                  showRemove
+                  onMoveUp={handleMoveExperienceUp}
+                  onMoveDown={handleMoveExperienceDown}
+                  showReorder
+                />
 
                 {/* Add Experience Form */}
-                <div className="space-y-4 p-4 border border-gray-200 rounded-lg bg-gray-50">
-                  <h4 className="font-medium text-gray-900">הוסף ניסיון חדש</h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label htmlFor="new-exp-title">תפקיד</Label>
-                      <Input
-                        id="new-exp-title"
-                        value={newExperience.title}
-                        onChange={(e) =>
-                          handleNewExperienceChange("title", e.target.value)
-                        }
-                        placeholder="למשל, מפתח Frontend בכיר"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <Label htmlFor="new-exp-company">חברה</Label>
-                      <Input
-                        id="new-exp-company"
-                        value={newExperience.company}
-                        onChange={(e) =>
-                          handleNewExperienceChange("company", e.target.value)
-                        }
-                        placeholder="למשל, TechCorp Inc."
-                      />
-                    </div>
-                  </div>
-
-                  {/* Currently Working Checkbox */}
-                  <div className="flex items-center space-x-2">
-                    <Checkbox
-                      id="currently-working"
-                      checked={newExperience.isCurrentlyWorking}
-                      onCheckedChange={(checked) =>
-                        handleNewExperienceChange(
-                          "isCurrentlyWorking",
-                          checked as boolean
-                        )
-                      }
-                    />
-                    <Label htmlFor="currently-working" className="text-sm">
-                      אני עובד כרגע בתפקיד זה
-                    </Label>
-                  </div>
-
-                  {/* Date Range */}
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <div className="space-y-2">
-                      <Label>תאריך התחלה</Label>
-                      <div className="flex gap-2">
-                        <Select
-                          value={newExperience.startMonth}
-                          onValueChange={(value) =>
-                            handleNewExperienceChange("startMonth", value)
-                          }
-                        >
-                          <SelectTrigger className="w-1/2">
-                            <SelectValue placeholder="חודש" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {months.map((month, index) => (
-                              <SelectItem key={index} value={month}>
-                                {month}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select
-                          value={newExperience.startYear}
-                          onValueChange={(value) =>
-                            handleNewExperienceChange("startYear", value)
-                          }
-                        >
-                          <SelectTrigger className="w-1/2">
-                            <SelectValue placeholder="שנה" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {years.map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-
-                    <div className="space-y-2">
-                      <Label>תאריך סיום</Label>
-                      <div className="flex gap-2">
-                        <Select
-                          value={newExperience.endMonth}
-                          onValueChange={(value) =>
-                            handleNewExperienceChange("endMonth", value)
-                          }
-                          disabled={newExperience.isCurrentlyWorking}
-                        >
-                          <SelectTrigger className="w-1/2">
-                            <SelectValue placeholder="חודש" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {months.map((month, index) => (
-                              <SelectItem key={index} value={month}>
-                                {month}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                        <Select
-                          value={newExperience.endYear}
-                          onValueChange={(value) =>
-                            handleNewExperienceChange("endYear", value)
-                          }
-                          disabled={newExperience.isCurrentlyWorking}
-                        >
-                          <SelectTrigger className="w-1/2">
-                            <SelectValue placeholder="שנה" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {years.map((year) => (
-                              <SelectItem key={year} value={year.toString()}>
-                                {year}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-2">
-                    <Label htmlFor="new-exp-description">תיאור</Label>
-                    <Textarea
-                      id="new-exp-description"
-                      value={newExperience.description}
-                      onChange={(e) =>
-                        handleNewExperienceChange("description", e.target.value)
-                      }
-                      placeholder="תאר את תפקידך והישגיך"
-                      rows={3}
-                    />
-                  </div>
-                  <Button
-                    type="button"
-                    variant="outline"
-                    onClick={handleAddExperience}
-                    disabled={
-                      !newExperience.title ||
-                      !newExperience.company ||
-                      !newExperience.startMonth ||
-                      !newExperience.startYear
-                    }
-                  >
-                    <Plus className="w-4 h-4 mr-2" /> הוסף ניסיון
-                  </Button>
-                </div>
+                <AddExperienceForm
+                  newExperience={newExperience}
+                  onChange={handleNewExperienceChange}
+                  onAdd={handleAddExperience}
+                  months={months}
+                  years={years}
+                  disabled={
+                    !newExperience.title ||
+                    !newExperience.company ||
+                    !newExperience.startMonth ||
+                    !newExperience.startYear
+                  }
+                />
               </div>
 
               <div className="flex justify-end">

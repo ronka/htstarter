@@ -2,30 +2,28 @@ import Link from "next/link";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { User } from "@/types/profile";
+import { ExperienceTimeline } from "@/components/profile/ExperienceTimeline";
 
 interface ProfileInfoProps {
   user: User;
 }
 
 const ProfileInfo = ({ user }: ProfileInfoProps) => {
-  const getExperienceTitle = (experience: string) => {
-    if (!experience) return "";
+  let experiences: any[] = [];
+  if (user.experience) {
     try {
-      const parsed = JSON.parse(experience);
+      const parsed = JSON.parse(user.experience);
       if (
         parsed &&
         typeof parsed === "object" &&
-        !Array.isArray(parsed) &&
-        typeof parsed.title === "string" &&
-        parsed.title.trim() !== ""
+        Array.isArray(parsed.experiences)
       ) {
-        return parsed.title;
+        experiences = parsed.experiences;
       }
     } catch (error) {
-      // ignore error, fall through
+      // ignore error
     }
-    return "";
-  };
+  }
 
   return (
     <Card className="p-6">
@@ -36,14 +34,12 @@ const ProfileInfo = ({ user }: ProfileInfoProps) => {
           className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
         />
         <h1 className="text-2xl font-bold text-gray-900 mb-1">{user.name}</h1>
-        <p className="text-gray-600 mb-2">
-          {getExperienceTitle(user.experience)}
-        </p>
         <p className="text-sm text-gray-500 mb-4">
           {user.location || "מיקום לא צוין"}
         </p>
-
-        <p className="text-sm text-gray-600">{user.bio || "אין תיאור זמין"}</p>
+        <p className="text-sm text-gray-600 mb-4">
+          {user.bio || "אין תיאור זמין"}
+        </p>
       </div>
     </Card>
   );
