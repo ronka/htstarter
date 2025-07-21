@@ -70,9 +70,8 @@ export function useSubmitProject() {
 
       // Show success toast
       toast({
-        title: "Project submitted!",
-        description:
-          "Your project has been successfully submitted and is now live.",
+        title: "הפרויקט נשלח!",
+        description: "הפרויקט שלך נשלח בהצלחה וכעת באוויר.",
       });
 
       // Navigate to the project page
@@ -81,7 +80,7 @@ export function useSubmitProject() {
     onError: (error: Error) => {
       // Show error toast
       toast({
-        title: "Submission failed",
+        title: "השליחה נכשלה",
         description: error.message,
         variant: "destructive",
       });

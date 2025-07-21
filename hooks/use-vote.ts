@@ -102,11 +102,11 @@ export const useVote = ({
 
       // Show success toast
       toast({
-        title: data.action === "voted" ? "Vote added!" : "Vote removed!",
+        title: data.action === "voted" ? "הצבעה נוספה!" : "הצבעה הוסרה!",
         description:
           data.action === "voted"
-            ? "Your vote has been recorded for today."
-            : "Your vote has been removed.",
+            ? "ההצבעה שלך נרשמה להיום."
+            : "ההצבעה שלך הוסרה.",
       });
     },
     onError: (error, variables, context) => {
@@ -119,9 +119,9 @@ export const useVote = ({
 
       // Show error toast
       toast({
-        title: "Vote failed",
+        title: "ההצבעה נכשלה",
         description:
-          error.message || "Failed to process your vote. Please try again.",
+          error.message || "לא ניתן היה לעבד את ההצבעה שלך. נסה שוב.",
         variant: "destructive",
       });
     },
@@ -131,8 +131,8 @@ export const useVote = ({
   const toggleVote = useCallback(() => {
     if (!userId) {
       toast({
-        title: "Authentication required",
-        description: "Please sign in to vote for projects.",
+        title: "נדרש להתחבר",
+        description: "אנא התחבר כדי להצביע לפרויקטים.",
         variant: "destructive",
       });
       return;

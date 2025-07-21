@@ -70,8 +70,8 @@ export function useUpdateUserProfile() {
 
       // Show success toast
       toast({
-        title: "Profile saved!",
-        description: "Your profile has been successfully saved.",
+        title: "הפרופיל נשמר!",
+        description: "הפרופיל שלך נשמר בהצלחה.",
       });
 
       // Navigate to profile page
@@ -80,7 +80,7 @@ export function useUpdateUserProfile() {
     onError: (error: Error) => {
       // Show error toast
       toast({
-        title: "Save failed",
+        title: "השמירה נכשלה",
         description: error.message,
         variant: "destructive",
       });
