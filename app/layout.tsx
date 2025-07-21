@@ -15,7 +15,7 @@ const notoSansHebrew = Noto_Sans_Hebrew({
 });
 
 export const metadata: Metadata = {
-  title: "DevHunt - גלה ושתף פרויקטים מדהימים",
+  title: "HighTechShip - גלוה ושתף פרויקטים מדהימים",
   description: "פלטפורמה למפתחים להציג ולגלות פרויקטים חדשניים",
 };
 

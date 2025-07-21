@@ -1,4 +1,4 @@
-# DevHunt - Project Showcase Platform
+# HighTechShip - Project Showcase Platform
 
 **Migrated from Vite to Next.js 15 with App Router**
 

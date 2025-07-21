@@ -8,12 +8,12 @@ const AboutPage = () => (
       <Card className="shadow-lg">
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-2xl">
-            🚀 אודות HighTechStarter
+            🚀 אודות HighTechShip
           </CardTitle>
         </CardHeader>
         <CardContent>
           <p className="text-lg mb-4">
-            HighTechStarter היא פלטפורמה קהילתית שמטרתה לחשוף, להעצים ולקדם
+            HighTechShip היא פלטפורמה קהילתית שמטרתה לחשוף, להעצים ולקדם
             פרויקטים טכנולוגיים ישראליים, יזמים ויוצרות. כאן תוכלו לגלות
             פרויקטים חדשניים, להצביע לזוכים יומיים, ולהתחבר עם יוצרים מוכשרים.
           </p>
@@ -40,14 +40,14 @@ const AboutPage = () => (
         <CardContent>
           <div className="flex flex-col gap-2">
             <p className="text-lg">
-              רון קנטור הוא מפתח תוכנה בגוגל, יזם, ומחבר הספר "המדריך להייטקיסט
-              המתחיל". רון התחיל את דרכו כחייל קרבי, למד לתואר במדעי המחשב
-              באוניברסיטה הפתוחה תוך כדי עבודה במשרה מלאה, ומאמין גדול בלמידה
-              עצמית ובהתמדה.
+              רון קנטור הוא מפתח תוכנה בגוגל, יזם, ומחבר הספר &quot;המדריך
+              להייטקיסט המתחיל&quot;. רון התחיל את דרכו כחייל קרבי, למד לתואר
+              במדעי המחשב באוניברסיטה הפתוחה תוך כדי עבודה במשרה מלאה, ומאמין
+              גדול בלמידה עצמית ובהתמדה.
             </p>
             <p className="text-md text-gray-600">
-              "מטרתי היא להעניק השראה ותובנות מעשיות לכל מי שחולם על קריירה
-              בעולם הטכנולוגיה."
+              &quot;מטרתי היא להעניק השראה ותובנות מעשיות לכל מי שחולם על קריירה
+              בעולם הטכנולוגיה.&quot;
               <br />
               מתוך{" "}
               <Link

@@ -2,14 +2,14 @@
 
 ## Introduction/Overview
 
-Convert the existing HighTechStarter website to a fully Hebrew-localized, right-to-left (RTL) interface. This involves translating all text content to Hebrew, implementing RTL layout support across all components, and ensuring proper Hebrew typography and user experience. The site name "HighTechStarter" will remain in English as the brand name, while all interface elements and content will be in Hebrew.
+Convert the existing HighTechShip website to a fully Hebrew-localized, right-to-left (RTL) interface. This involves translating all text content to Hebrew, implementing RTL layout support across all components, and ensuring proper Hebrew typography and user experience. The site name "HighTechShip" will remain in English as the brand name, while all interface elements and content will be in Hebrew.
 
 ## Goals
 
 1. **Complete Hebrew Localization**: Translate all UI text, content, and user-facing messages to Hebrew
 2. **RTL Layout Implementation**: Ensure all components, forms, and layouts work correctly in RTL direction
 3. **Cultural Adaptation**: Adapt the interface to Hebrew reading patterns and cultural expectations
-4. **Maintain Brand Identity**: Keep "HighTechStarter" as the English brand name while localizing the interface
+4. **Maintain Brand Identity**: Keep "HighTechShip" as the English brand name while localizing the interface
 5. **Preserve Functionality**: Ensure all existing features work seamlessly in the Hebrew RTL environment
 
 ## User Stories

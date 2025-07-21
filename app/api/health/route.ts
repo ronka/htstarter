@@ -4,6 +4,6 @@ export async function GET() {
   return NextResponse.json({
     status: "ok",
     timestamp: new Date().toISOString(),
-    message: "DevHunt API is running",
+    message: "HighTechShip API is running",
   });
 }
