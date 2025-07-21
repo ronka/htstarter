@@ -1,6 +1,6 @@
 {
 	"$schema": "https://openapi.vercel.sh/vercel.json",
-	"cron": [
+	"crons": [
 		{
 			"path": "/api/cron/daily-winner",
 			"schedule": "0 0 * * *"
