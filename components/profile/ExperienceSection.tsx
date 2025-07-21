@@ -39,12 +39,12 @@ const ExperienceSection = ({ experience }: ExperienceSectionProps) => {
         return (
           <div className="relative">
             {/* Timeline line */}
-            <div className="absolute left-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
+            <div className="absolute right-4 top-0 bottom-0 w-0.5 bg-gray-200"></div>
 
             {experienceData.map((exp, index) => (
-              <div key={index} className="relative pl-12 pb-6">
+              <div key={index} className="relative pr-12 pb-6">
                 {/* Timeline dot */}
-                <div className="absolute left-2 top-2 w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-sm"></div>
+                <div className="absolute right-2 top-2 w-4 h-4 bg-blue-500 rounded-full border-2 border-white shadow-sm"></div>
 
                 <div className="bg-white p-4 rounded-lg border border-gray-200 shadow-sm">
                   <h4 className="font-semibold text-gray-900 mb-1">
