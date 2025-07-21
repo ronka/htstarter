@@ -55,11 +55,13 @@ const YesterdayWinner = ({ winner }: { winner: DailyWinnerWithProject }) => {
       {/* Gold gradient overlay */}
       <div className="absolute inset-0 bg-gradient-to-r from-yellow-100 to-yellow-50 opacity-30"></div>
 
-      <div className="relative z-10 flex gap-4 pt-2">
-        <div className="flex flex-col items-center min-w-[60px]">
+      <div className="relative z-10 flex flex-col sm:flex-row gap-4 pt-2">
+        <div className="flex flex-row sm:flex-col items-center min-w-[60px] sm:min-w-[60px]">
           <div className="text-2xl font-bold text-yellow-600">🏆</div>
-          <div className="text-xs text-gray-500">ניצחון</div>
-          <div className="text-lg font-bold text-yellow-600">
+          <div className="text-xs text-gray-500 sm:mb-0 ml-2 sm:ml-0">
+            ניצחון
+          </div>
+          <div className="text-lg font-bold text-yellow-600 ml-2 sm:ml-0">
             {winner.voteCount}
           </div>
           <div className="text-xs text-gray-500">קולות</div>
@@ -70,14 +72,14 @@ const YesterdayWinner = ({ winner }: { winner: DailyWinnerWithProject }) => {
             <img
               src={winner.project.image}
               alt={winner.project.title}
-              className="w-20 h-16 object-cover rounded-lg hover:opacity-80 transition-opacity"
+              className="w-20 h-16 sm:w-20 sm:h-16 w-full h-24 object-cover rounded-lg hover:opacity-80 transition-opacity"
             />
           </Link>
         </div>
 
-        <div className="flex-1 min-w-0 pr-16">
+        <div className="flex-1 min-w-0 pr-0 sm:pr-16">
           <Link href={`/project/${winner.project.id}`} className="group">
-            <h3 className="font-semibold text-lg text-gray-900 group-hover:text-yellow-600 transition-colors mb-1">
+            <h3 className="font-semibold text-lg sm:text-lg text-base text-gray-900 group-hover:text-yellow-600 transition-colors mb-1">
               {winner.project.title}
             </h3>
           </Link>
@@ -85,7 +87,7 @@ const YesterdayWinner = ({ winner }: { winner: DailyWinnerWithProject }) => {
             {winner.project.description}
           </p>
 
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm text-gray-500">
             <Link
               href={`/profile/${winner.project.author.id}`}
               className="hover:text-gray-700 transition-colors"
@@ -129,47 +131,35 @@ const ProjectListItem = ({ project }: { project: Project }) => {
   };
 
   return (
-    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow">
-      <div className="flex gap-4">
-        <div className="flex flex-col items-center min-w-[60px]">
-          <div className="text-2xl font-bold text-gray-900">{dailyVotes}</div>
-          <div className="text-xs text-gray-500">Vibes</div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={handleVote}
-            disabled={isLoading}
-            className="mt-2 text-xs text-blue-600 hover:text-blue-700"
-          >
-            {isLoading ? (
-              <Loader2 className="w-3 h-3 animate-spin" />
-            ) : (
-              "Vibe it"
-            )}
-          </Button>
+    <div className="bg-white border border-gray-200 rounded-lg p-4 hover:shadow-sm transition-shadow flex flex-col gap-3">
+      <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-row sm:flex-col items-center min-w-[60px] sm:min-w-[60px] order-2 sm:order-1 w-full sm:w-auto justify-between sm:justify-start">
+          <div className="flex flex-col items-center w-full sm:w-auto">
+            <span className="text-xs text-gray-500 mb-1">Vibes</span>
+            <span className="text-2xl font-bold text-gray-900">
+              {dailyVotes}
+            </span>
+          </div>
         </div>
-
-        <div className="flex-shrink-0">
+        <div className="flex-shrink-0 order-1 sm:order-2 mb-2 sm:mb-0">
           <Link href={`/project/${project.id}`}>
             <img
               src={project.image}
               alt={project.title}
-              className="w-20 h-16 object-cover rounded-lg hover:opacity-80 transition-opacity"
+              className="w-full h-32 sm:w-20 sm:h-16 object-cover rounded-lg hover:opacity-80 transition-opacity"
             />
           </Link>
         </div>
-
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 order-3">
           <Link href={`/project/${project.id}`} className="group">
-            <h3 className="font-semibold text-lg text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
+            <h3 className="font-semibold text-base sm:text-lg text-gray-900 group-hover:text-blue-600 transition-colors mb-1">
               {project.title}
             </h3>
           </Link>
           <p className="text-gray-600 text-sm mb-3 line-clamp-2">
             {project.description}
           </p>
-
-          <div className="flex items-center gap-4 text-sm text-gray-500">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4 text-sm text-gray-500 mb-2">
             <Link
               href={`/profile/${project.author.id}`}
               className="hover:text-gray-700 transition-colors"
@@ -189,7 +179,7 @@ const ProjectListItem = ({ project }: { project: Project }) => {
                   hasVoted ? "fill-current text-red-500" : ""
                 }`}
               />
-              <span>{dailyVotes} votes today</span>
+              <span>{dailyVotes} קולות היום</span>
             </div>
             <div className="flex items-center gap-1">
               <GitFork className="w-4 h-4" />
@@ -198,6 +188,22 @@ const ProjectListItem = ({ project }: { project: Project }) => {
           </div>
         </div>
       </div>
+      {/* <Button
+        variant="default"
+        size="lg"
+        onClick={handleVote}
+        disabled={isLoading}
+        aria-label="Vibe this project"
+        className="w-full mt-2 text-lg font-bold flex items-center justify-center gap-2 rounded-xl shadow-md py-3 px-4 transition-all duration-150 focus:outline-none focus:ring-2 focus:ring-blue-400 focus:ring-offset-2 disabled:opacity-60 disabled:cursor-not-allowed bg-gradient-to-r from-pink-500 to-blue-600 text-white hover:from-pink-600 hover:to-blue-700"
+      >
+        {isLoading ? (
+          <Loader2 className="w-5 h-5 animate-spin" />
+        ) : (
+          <>
+            Vibe it <Heart className="w-6 h-6 text-white ml-2" />
+          </>
+        )}
+      </Button> */}
     </div>
   );
 };
