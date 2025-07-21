@@ -6,6 +6,8 @@ import { useEffect } from "react";
 import { EditProfileForm } from "./EditProfileForm";
 import { EditProfileSkeleton } from "@/components/profile/EditProfileSkeleton";
 import { useUserProfile } from "@/hooks/use-user-profile";
+import NewUserProfileAlert from "@/components/profile/NewUserProfileAlert";
+import { useIsNewUser } from "@/hooks/use-is-new-user";
 
 // Default empty profile data for new users
 const defaultProfileData = {
@@ -25,12 +27,16 @@ export default function EditProfilePage() {
   const params = useParams();
   const router = useRouter();
   const profileId = params.id as string;
+  const {
+    isNewUser,
+    isLoading: isCheckingNewUser,
+    error,
+  } = useIsNewUser(profileId);
 
   // Use React Query to fetch user profile
   const {
     data: userProfileData,
     isLoading,
-    error,
     isError,
   } = useUserProfile(profileId);
 
@@ -48,28 +54,20 @@ export default function EditProfilePage() {
   }, [userId, profileId, router]);
 
   // Show loading state
-  if (isLoading) {
+  if (isLoading || isCheckingNewUser) {
     return <EditProfileSkeleton />;
   }
 
   // Handle error states
-  if (isError) {
+  if (isError || isNewUser) {
     const errorMessage =
       error instanceof Error ? error.message : "Failed to load profile";
 
     // If user not found, show empty form with message for new user
-    if (errorMessage === "User not found") {
+    if (isNewUser) {
       return (
         <>
-          <div
-            className="bg-blue-50 border border-blue-200 text-blue-800 px-4 py-3 rounded relative"
-            role="alert"
-          >
-            <span className="block sm:inline">
-              Welcome! Let&apos;s create your profile. Fill in the details below
-              to get started.
-            </span>
-          </div>
+          <NewUserProfileAlert />
           <EditProfileForm
             id={profileId}
             initialData={defaultProfileData}
@@ -89,7 +87,7 @@ export default function EditProfilePage() {
             onClick={() => window.location.reload()}
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors"
           >
-            Try Again
+            נסה שנית
           </button>
         </div>
       </div>

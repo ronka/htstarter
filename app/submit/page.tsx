@@ -15,10 +15,12 @@ import {
   ProjectFormData,
   UploadedImage,
 } from "@/components/submit";
+import { useIsNewUser } from "@/hooks/use-is-new-user";
 
 export default function SubmitPage() {
   const router = useRouter();
   const { userId } = useAuth();
+  const { isNewUser, isLoading: isCheckingNewUser } = useIsNewUser(userId);
   const submitProjectMutation = useSubmitProject();
   const [currentStep, setCurrentStep] = useState(1);
   const [uploadedImages, setUploadedImages] = useState<UploadedImage[]>([]);
@@ -32,6 +34,13 @@ export default function SubmitPage() {
     technologies: [],
     features: [""],
   });
+
+  useEffect(() => {
+    if (isCheckingNewUser) return;
+    if (isNewUser && userId) {
+      router.replace(`/profile/${userId}/edit`);
+    }
+  }, [isNewUser, isCheckingNewUser, userId, router]);
 
   const handleInputChange = (field: keyof ProjectFormData, value: string) => {
     setFormData((prev) => ({
@@ -117,6 +126,14 @@ export default function SubmitPage() {
   const prevStep = () => {
     setCurrentStep((prev) => Math.max(prev - 1, 1));
   };
+
+  if (isCheckingNewUser) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <span className="text-gray-600 text-lg">בודק משתמש...</span>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-gray-50">
