@@ -25,7 +25,7 @@ export const Step3ProjectInsights = ({
           <TabsTrigger value="preview">תצוגה מקדימה</TabsTrigger>
         </TabsList>
 
-        <TabsContent value="edit" className="space-y-2">
+        <TabsContent value="dit" className="space-y-2">
           <Textarea
             id="longDescription"
             value={formData.longDescription}
@@ -35,7 +35,7 @@ export const Step3ProjectInsights = ({
             className="mt-1"
           />
           <p className="text-sm text-gray-500">
-            תוכל להשתמש ב-Markdown לעיצוב הטקסט (כותרות, רשימות, קוד, וכו')
+            תוכל להשתמש ב-Markdown לעיצוב הטקסט (כותרות, רשימות, קוד, וכו&apos;)
           </p>
         </TabsContent>
 
