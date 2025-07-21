@@ -9,8 +9,6 @@ export interface User {
   github?: string;
   twitter?: string;
   skills?: string[];
-  followers?: number;
-  following?: number;
   createdAt: string;
   updatedAt: string;
 }

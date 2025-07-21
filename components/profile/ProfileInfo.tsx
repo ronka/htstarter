@@ -43,36 +43,6 @@ const ProfileInfo = ({ user }: ProfileInfoProps) => {
           {user.location || "מיקום לא צוין"}
         </p>
 
-        <div className="flex justify-center gap-4 mb-6">
-          <div className="text-center">
-            <div className="text-xl font-bold text-gray-900">
-              {user.followers || 0}
-            </div>
-            <div className="text-sm text-gray-500">עוקבים</div>
-          </div>
-          <div className="text-center">
-            <div className="text-xl font-bold text-gray-900">
-              {user.following || 0}
-            </div>
-            <div className="text-sm text-gray-500">עוקב אחרי</div>
-          </div>
-        </div>
-
-        <div className="flex justify-center gap-2 mb-4">
-          <Button size="sm">עקוב</Button>
-          <Button variant="outline" size="sm">
-            שלח הודעה
-          </Button>
-        </div>
-
-        <div className="mb-6">
-          <Link href={`/profile/${user.id}/edit`}>
-            <Button variant="outline" size="sm" className="w-full">
-              ערוך פרופיל
-            </Button>
-          </Link>
-        </div>
-
         <p className="text-sm text-gray-600">{user.bio || "אין תיאור זמין"}</p>
       </div>
     </Card>
