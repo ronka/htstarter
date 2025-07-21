@@ -30,7 +30,7 @@ export const Step3ProjectInsights = ({
             id="longDescription"
             value={formData.longDescription}
             onChange={(e) => onInputChange("longDescription", e.target.value)}
-            placeholder="תאר את הפרויקט בפירוט, כולל האדריכלות הטכנית, האתגרים שעמדת בפניהם, הפתרונות שיישמת, וכל פרט נוסף שיכול לעזור להבין את הפרויקט טוב יותר. תוכל להשתמש ב-Markdown לעיצוב הטקסט."
+            placeholder="תאר את הפרויקט בפירוט, כולל האדריכלות הטכנית, האתגרים שעמדת בפניהם, הפתרונות שיישמת, וכל פרט נוסף שיכול לעזור להבין את הפרויקט טוב יותר. תוכל להשתמש ב-Markdown לעיצוב הטקסט.'"
             rows={8}
             className="mt-1"
           />
