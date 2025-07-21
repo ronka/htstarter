@@ -9,22 +9,22 @@ interface ProfileInfoProps {
 
 const ProfileInfo = ({ user }: ProfileInfoProps) => {
   const getExperienceTitle = (experience: string) => {
+    if (!experience) return "";
     try {
-      if (experience) {
-        const parsed = JSON.parse(experience);
-        if (
-          parsed &&
-          typeof parsed === "object" &&
-          !Array.isArray(parsed) &&
-          parsed.title
-        ) {
-          return parsed.title;
-        }
+      const parsed = JSON.parse(experience);
+      if (
+        parsed &&
+        typeof parsed === "object" &&
+        !Array.isArray(parsed) &&
+        typeof parsed.title === "string" &&
+        parsed.title.trim() !== ""
+      ) {
+        return parsed.title;
       }
     } catch (error) {
-      return experience;
+      // ignore error, fall through
     }
-    return experience;
+    return "";
   };
 
   return (
