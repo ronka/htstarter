@@ -55,12 +55,6 @@ const Header = () => {
               זוכים יומיים
             </Link>
             <Link
-              href="/makers"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              יוצרים
-            </Link>
-            <Link
               href="/about"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
@@ -136,13 +130,6 @@ const Header = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 זוכים יומיים
-              </Link>
-              <Link
-                href="/makers"
-                className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
-                onClick={() => setIsMobileMenuOpen(false)}
-              >
-                יוצרים
               </Link>
               <Link
                 href="/about"

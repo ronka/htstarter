@@ -75,7 +75,7 @@ const RonkaCourseSection = () => {
         <img
           src="https://hightechguide.co.il/_next/image?url=%2Fcourse-assets%2Fcover.png&w=640&q=75"
           alt="Book Cover"
-          className="aspect-[1/1] bg-gray-300 w-full object-cover"
+          className="aspect-[16/9] bg-gray-300 w-full object-cover"
         />
         <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
       </div>
