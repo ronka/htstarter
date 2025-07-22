@@ -24,6 +24,8 @@ import {
   Experience,
 } from "@/components/profile/AddExperienceForm";
 import { ExperienceTimeline } from "@/components/profile/ExperienceTimeline";
+import { getTechnologyStyle } from "@/lib/technologies";
+import { techOptions } from "@/lib/technologies";
 
 // This is a placeholder for the actual user profile type
 interface UserProfile {
@@ -483,19 +485,62 @@ export function EditProfileForm({
               {/* Skills */}
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold">כישורים</h3>
+                {/* Quick add skill buttons */}
+                {techOptions.filter(
+                  (tech) => !formData.skills.includes(tech.name)
+                ).length > 0 && (
+                  <div className="mb-2">
+                    <p className="text-sm text-gray-600 mb-2">
+                      כישורים נפוצים:
+                    </p>
+                    <div className="flex flex-wrap gap-2">
+                      {techOptions
+                        .filter((tech) => !formData.skills.includes(tech.name))
+                        .slice(0, 12)
+                        .map((tech) => (
+                          <Button
+                            key={tech.name}
+                            type="button"
+                            variant="outline"
+                            size="sm"
+                            onClick={() => {
+                              if (!formData.skills.includes(tech.name)) {
+                                setFormData((prev) => ({
+                                  ...prev,
+                                  skills: [...prev.skills, tech.name],
+                                }));
+                              }
+                            }}
+                            className={`${tech.color} hover:opacity-80 transition-opacity`}
+                          >
+                            <span className="mr-1">{tech.emoji}</span>
+                            {tech.name}
+                          </Button>
+                        ))}
+                    </div>
+                  </div>
+                )}
                 <div className="flex flex-wrap gap-2">
-                  {formData.skills.map((skill) => (
-                    <Badge key={skill} variant="secondary">
-                      {skill}
-                      <button
-                        type="button"
-                        onClick={() => handleRemoveSkill(skill)}
-                        className="ml-2 text-gray-500 hover:text-gray-700"
+                  {formData.skills.map((skill) => {
+                    const { emoji, color } = getTechnologyStyle(skill);
+                    return (
+                      <Badge
+                        key={skill}
+                        variant="secondary"
+                        className={color + " flex items-center text-xs"}
                       >
-                        <X className="w-3 h-3" />
-                      </button>
-                    </Badge>
-                  ))}
+                        {emoji && <span className="mr-1">{emoji}</span>}
+                        {skill}
+                        <button
+                          type="button"
+                          onClick={() => handleRemoveSkill(skill)}
+                          className="ml-2 text-gray-500 hover:text-gray-700"
+                        >
+                          <X className="w-3 h-3" />
+                        </button>
+                      </Badge>
+                    );
+                  })}
                 </div>
                 <div className="flex gap-2">
                   <Input
