@@ -14,6 +14,13 @@ const userSchema = z.object({
   website: z.string().optional(),
   github: z.string().optional(),
   twitter: z.string().optional(),
+  avatar: z
+    .string()
+    .regex(
+      /^(?:(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)|(?:\p{Regional_Indicator}\p{Regional_Indicator}))$/u,
+      "Avatar must be a emoji character"
+    )
+    .optional(),
   skills: z.array(z.string()).optional(),
 });
 
@@ -128,6 +135,7 @@ export async function POST(
       .values({
         id: userId,
         name: validatedData.name,
+        avatar: validatedData.avatar || null,
         bio: validatedData.bio || null,
         location: validatedData.location || null,
         experience: validatedData.experience || null,

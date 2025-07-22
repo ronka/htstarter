@@ -361,9 +361,9 @@ export function EditProfileForm({
                 </button>
                 {showEmojiPicker && (
                   <div className="grid grid-cols-8 gap-2 max-h-40 overflow-y-auto bg-white border p-2 rounded shadow-lg z-10">
-                    {emojiList.map((emoji) => (
+                    {emojiList.map((emoji, index) => (
                       <button
-                        key={emoji}
+                        key={emoji + index}
                         type="button"
                         className="text-2xl hover:bg-gray-200 rounded p-1"
                         onClick={() => {
@@ -386,7 +386,7 @@ export function EditProfileForm({
                     setFormData((prev) => ({ ...prev, avatar: e.target.value }))
                   }
                   placeholder="😀"
-                  aria-label="הכנס אימוג'י"
+                  aria-label="הכנס אימוג&rsquo;י"
                 />
               </div>
               {/* Basic Information */}
