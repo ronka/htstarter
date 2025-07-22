@@ -2,7 +2,7 @@ export const mockUsers = [
   {
     id: "user1",
     name: "שרה חן",
-    avatar: "https://images.unsplash.com/photo-1494790108755-2616b612c757",
+    avatar: "👩‍💻",
     bio: "מפתחת פול-סטק עם תשוקה לבינה מלאכותית וטכנולוגיות ווב מודרניות",
     location: "סן פרנסיסקו, קליפורניה",
     joinedDate: "מרץ 2023",
@@ -18,7 +18,7 @@ export const mockUsers = [
   {
     id: "user2",
     name: "מייק רודריגז",
-    avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
+    avatar: "🧑‍💻",
     bio: "מפתח Full-Stack המתמחה באפליקציות בזמן אמת ושיתוף פעולה",
     location: 'ניו יורק, ארה"ב',
     joinedDate: "ינואר 2023",
@@ -41,7 +41,7 @@ export const mockUsers = [
   {
     id: "user3",
     name: "אמה תומפסון",
-    avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+    avatar: "🦄",
     bio: "מפתחת Frontend עם תשוקה לאפליקציות חברתיות וטכנולוגיות ווב",
     location: "לונדון, בריטניה",
     joinedDate: "פברואר 2023",
@@ -57,7 +57,7 @@ export const mockUsers = [
   {
     id: "user4",
     name: "אלכס ג'ונסון",
-    avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+    avatar: "🚀",
     bio: "מפתח Full-Stack המתמחה בטכנולוגיות פיננסיות וקריפטו",
     location: "אוסטין, טקסס",
     joinedDate: "דצמבר 2022",
@@ -73,7 +73,7 @@ export const mockUsers = [
   {
     id: "user5",
     name: "ליסה פארק",
-    avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
+    avatar: "🐱",
     bio: "מפתחת Frontend המתמחה באפליקציות מינימליסטיות ו-PWA",
     location: "סיאול, דרום קוריאה",
     joinedDate: "נובמבר 2022",
@@ -89,7 +89,7 @@ export const mockUsers = [
   {
     id: "user6",
     name: "דיויד קים",
-    avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+    avatar: "🐻",
     bio: "מפתח Backend המתמחה בבינה מלאכותית וכלי פיתוח",
     location: "ונקובר, קנדה",
     joinedDate: "אוקטובר 2022",
@@ -121,7 +121,7 @@ export const mockProjects = [
     author: {
       id: "user1",
       name: "שרה חן",
-      avatar: "https://images.unsplash.com/photo-1494790108755-2616b612c757",
+      avatar: "👩‍💻",
     },
     technologies: ["React", "TypeScript", "OpenAI API", "Tailwind CSS"],
     votes: 124,
@@ -156,7 +156,7 @@ export const mockProjects = [
     author: {
       id: "user2",
       name: "מייק רודריגז",
-      avatar: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e",
+      avatar: "🧑‍💻",
     },
     technologies: ["Next.js", "Socket.io", "Canvas API", "MongoDB"],
     votes: 89,
@@ -187,7 +187,7 @@ export const mockProjects = [
     author: {
       id: "user3",
       name: "אמה תומפסון",
-      avatar: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80",
+      avatar: "🦄",
     },
     technologies: ["Vue.js", "Firebase", "Cloudinary", "Express.js"],
     votes: 156,
@@ -218,7 +218,7 @@ export const mockProjects = [
     author: {
       id: "user4",
       name: "אלכס ג'ונסון",
-      avatar: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d",
+      avatar: "🚀",
     },
     technologies: ["React", "Chart.js", "CoinGecko API", "Material-UI"],
     votes: 203,
@@ -249,7 +249,7 @@ export const mockProjects = [
     author: {
       id: "user5",
       name: "ליסה פארק",
-      avatar: "https://images.unsplash.com/photo-1544005313-94ddf0286df2",
+      avatar: "🐱",
     },
     technologies: ["Svelte", "D3.js", "IndexedDB", "PWA"],
     votes: 78,
@@ -275,7 +275,7 @@ export const mockProjects = [
     author: {
       id: "user6",
       name: "דיויד קים",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e",
+      avatar: "🐻",
     },
     technologies: ["Python", "OpenAI API", "FastAPI", "React"],
     votes: 267,

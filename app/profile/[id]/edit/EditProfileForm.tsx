@@ -36,6 +36,7 @@ interface UserProfile {
   bio: string;
   skills: string[];
   experience: Experience[];
+  avatar?: string;
 }
 
 interface EditProfileFormProps {
@@ -82,6 +83,113 @@ export function EditProfileForm({
     isCurrentlyWorking: false,
     description: "",
   });
+  const [showEmojiPicker, setShowEmojiPicker] = useState(false);
+  const emojiList = [
+    "😀",
+    "😎",
+    "🦄",
+    "👩‍💻",
+    "👨‍💻",
+    "🚀",
+    "🐱",
+    "🐶",
+    "🦊",
+    "🐻",
+    "🐼",
+    "🐸",
+    "🐵",
+    "🦁",
+    "🐯",
+    "🐨",
+    "🐔",
+    "🐧",
+    "🐦",
+    "🐤",
+    "🐣",
+    "🦆",
+    "🦉",
+    "🦇",
+    "🐺",
+    "🐗",
+    "🐴",
+    "🦄",
+    "🐝",
+    "🐛",
+    "🦋",
+    "🐌",
+    "🐞",
+    "🐜",
+    "🦗",
+    "🕷",
+    "🦂",
+    "🐢",
+    "🐍",
+    "🦎",
+    "🦖",
+    "🦕",
+    "🐙",
+    "🦑",
+    "🦐",
+    "🦞",
+    "🦀",
+    "🐡",
+    "🐠",
+    "🐟",
+    "🐬",
+    "🐳",
+    "🐋",
+    "🦈",
+    "🐊",
+    "🐅",
+    "🐆",
+    "🦓",
+    "🦍",
+    "🦧",
+    "🐘",
+    "🦛",
+    "🦏",
+    "🐪",
+    "🐫",
+    "🦒",
+    "🦘",
+    "🦬",
+    "🐃",
+    "🐂",
+    "🐄",
+    "🐎",
+    "🐖",
+    "🐏",
+    "🐑",
+    "🦙",
+    "🐐",
+    "🦌",
+    "🐕",
+    "🐩",
+    "🦮",
+    "🐕‍🦺",
+    "🐈",
+    "🐈‍⬛",
+    "🪶",
+    "🐓",
+    "🦃",
+    "🦤",
+    "🦚",
+    "🦜",
+    "🦢",
+    "🦩",
+    "🕊",
+    "🐇",
+    "🦝",
+    "🦨",
+    "🦡",
+    "🦫",
+    "🦦",
+    "🦥",
+    "🐁",
+    "🐀",
+    "🐿",
+    "🦔",
+  ];
 
   const handleInputChange = (field: string, value: string) => {
     setFormData((prev) => ({
@@ -202,6 +310,7 @@ export function EditProfileForm({
       github: formData.github,
       twitter: formData.twitter,
       skills: formData.skills,
+      avatar: formData.avatar || "😀",
     };
 
     updateProfileMutation.mutate({ userId: id, data: updateData });
@@ -239,6 +348,47 @@ export function EditProfileForm({
           </CardHeader>
           <CardContent>
             <form onSubmit={handleSubmit} className="space-y-8">
+              {/* Avatar Emoji Picker */}
+              <div className="flex flex-col items-center mb-6">
+                <label className="mb-2 font-semibold">אווטאר (אימוג'י)</label>
+                <button
+                  type="button"
+                  className="text-4xl bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mb-2 border border-gray-300 hover:bg-gray-200 transition"
+                  onClick={() => setShowEmojiPicker((v) => !v)}
+                  aria-label="בחר אימוג'י"
+                >
+                  {formData.avatar || "😀"}
+                </button>
+                {showEmojiPicker && (
+                  <div className="grid grid-cols-8 gap-2 max-h-40 overflow-y-auto bg-white border p-2 rounded shadow-lg z-10">
+                    {emojiList.map((emoji) => (
+                      <button
+                        key={emoji}
+                        type="button"
+                        className="text-2xl hover:bg-gray-200 rounded p-1"
+                        onClick={() => {
+                          setFormData((prev) => ({ ...prev, avatar: emoji }));
+                          setShowEmojiPicker(false);
+                        }}
+                        aria-label={`בחר ${emoji}`}
+                      >
+                        {emoji}
+                      </button>
+                    ))}
+                  </div>
+                )}
+                <input
+                  type="text"
+                  className="mt-2 text-center border rounded p-1 w-16"
+                  maxLength={2}
+                  value={formData.avatar || ""}
+                  onChange={(e) =>
+                    setFormData((prev) => ({ ...prev, avatar: e.target.value }))
+                  }
+                  placeholder="😀"
+                  aria-label="הכנס אימוג'י"
+                />
+              </div>
               {/* Basic Information */}
               <div className="space-y-6">
                 <h3 className="text-lg font-semibold">מידע בסיסי</h3>

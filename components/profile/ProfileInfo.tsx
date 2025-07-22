@@ -28,11 +28,12 @@ const ProfileInfo = ({ user }: ProfileInfoProps) => {
   return (
     <Card className="p-6">
       <div className="text-center">
-        <img
-          src={user.avatar || "/placeholder.svg"}
-          alt={user.name}
-          className="w-24 h-24 rounded-full mx-auto mb-4 object-cover"
-        />
+        <span
+          className="w-24 h-24 rounded-full mx-auto mb-4 object-cover flex items-center justify-center text-6xl bg-gray-100 border border-gray-300"
+          style={{ display: "inline-flex" }}
+        >
+          {user.avatar || "😀"}
+        </span>
         <h1 className="text-2xl font-bold text-gray-900 mb-1">{user.name}</h1>
         <p className="text-sm text-gray-500 mb-4">
           {user.location || "מיקום לא צוין"}
