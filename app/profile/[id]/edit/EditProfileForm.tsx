@@ -354,7 +354,9 @@ export function EditProfileForm({
             <form onSubmit={handleSubmit} className="space-y-8">
               {/* Avatar Emoji Picker */}
               <div className="flex flex-col items-center mb-6">
-                <label className="mb-2 font-semibold">אווטאר (אימוג'י)</label>
+                <label className="mb-2 font-semibold">
+                  אווטאר (אימוג&apos;י)
+                </label>
                 <button
                   type="button"
                   className="text-4xl bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mb-2 border border-gray-300 hover:bg-gray-200 transition"
