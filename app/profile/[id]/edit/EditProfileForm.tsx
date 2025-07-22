@@ -359,7 +359,7 @@ export function EditProfileForm({
                   type="button"
                   className="text-4xl bg-gray-100 rounded-full w-20 h-20 flex items-center justify-center mb-2 border border-gray-300 hover:bg-gray-200 transition"
                   onClick={() => setShowEmojiPicker((v) => !v)}
-                  aria-label="בחר אימוג'י"
+                  aria-label="בחר אימוג&#39;י"
                 >
                   {formData.avatar || "😀"}
                 </button>
