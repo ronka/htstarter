@@ -8,6 +8,7 @@ import { TechnologyBadge } from "@/components/ui/technology-badge";
 import { X, Plus } from "lucide-react";
 import { ProjectFormData } from "./types";
 import { techOptions } from "@/lib/technologies";
+import { Combobox } from "@/components/ui/Combobox";
 
 interface Step2TechnicalDetailsProps {
   formData: ProjectFormData;
@@ -182,7 +183,7 @@ export const Step2TechnicalDetails = ({
 
   return (
     <>
-      <div>
+      <div className="space-y-2">
         <Label>טכנולוגיות בשימוש *</Label>
 
         {/* Quick add technology buttons */}
@@ -207,23 +208,27 @@ export const Step2TechnicalDetails = ({
           </div>
         )}
 
-        <div className="flex gap-2 mt-3">
-          <Input
-            value={techInput}
-            onChange={(e) => setTechInput(e.target.value)}
-            placeholder="הוסף טכנולוגיה מותאמת אישית"
-            onKeyPress={(e) =>
-              e.key === "Enter" && (e.preventDefault(), addTechnology())
+        {/* Autocomplete Combobox for technologies */}
+        <Combobox
+          options={techOptions.map((tech) => ({
+            value: tech.name,
+            label: tech.name,
+            emoji: tech.emoji,
+            color: tech.color,
+          }))}
+          value={""}
+          onChange={(val) => {
+            if (val && !formData.technologies.includes(val)) {
+              onFormDataChange({
+                ...formData,
+                technologies: [...formData.technologies, val],
+              });
             }
-          />
-          <Button
-            type="button"
-            onClick={() => addTechnology()}
-            variant="outline"
-          >
-            <Plus className="w-4 h-4" />
-          </Button>
-        </div>
+          }}
+          placeholder="הוסף טכנולוגיה מותאמת אישית"
+          allowCustomValue={true}
+          disabledOptions={formData.technologies}
+        />
 
         {/* Selected technologies */}
         {formData.technologies.length > 0 && (

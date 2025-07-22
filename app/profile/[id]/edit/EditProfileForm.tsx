@@ -26,6 +26,7 @@ import {
 import { ExperienceTimeline } from "@/components/profile/ExperienceTimeline";
 import { getTechnologyStyle } from "@/lib/technologies";
 import { techOptions } from "@/lib/technologies";
+import { Combobox, ComboboxOption } from "@/components/ui/Combobox";
 
 // This is a placeholder for the actual user profile type
 interface UserProfile {
@@ -89,6 +90,7 @@ export function EditProfileForm({
   const emojiList = [
     "😀",
     "😎",
+    "👨‍🚀",
     "🦄",
     "👩‍💻",
     "👨‍💻",
@@ -520,6 +522,27 @@ export function EditProfileForm({
                     </div>
                   </div>
                 )}
+                {/* Autocomplete Combobox for skills */}
+                <Combobox
+                  options={techOptions.map((tech) => ({
+                    value: tech.name,
+                    label: tech.name,
+                    emoji: tech.emoji,
+                    color: tech.color,
+                  }))}
+                  value={""}
+                  onChange={(val) => {
+                    if (val && !formData.skills.includes(val)) {
+                      setFormData((prev) => ({
+                        ...prev,
+                        skills: [...prev.skills, val],
+                      }));
+                    }
+                  }}
+                  placeholder="הוסף כישור או טכנולוגיה"
+                  allowCustomValue={true}
+                  disabledOptions={formData.skills}
+                />
                 <div className="flex flex-wrap gap-2">
                   {formData.skills.map((skill) => {
                     const { emoji, color } = getTechnologyStyle(skill);
@@ -541,16 +564,6 @@ export function EditProfileForm({
                       </Badge>
                     );
                   })}
-                </div>
-                <div className="flex gap-2">
-                  <Input
-                    value={newSkill}
-                    onChange={(e) => setNewSkill(e.target.value)}
-                    placeholder="הוסף כישור חדש"
-                  />
-                  <Button type="button" onClick={handleAddSkill}>
-                    <Plus className="w-4 h-4" />
-                  </Button>
                 </div>
               </div>
 
