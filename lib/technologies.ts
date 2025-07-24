@@ -7,6 +7,46 @@ export interface TechnologyInfo {
 // Predefined technology options with colors and emojis
 export const techOptions: TechnologyInfo[] = [
   {
+    name: "Base 44",
+    emoji: "🌞",
+    color: "bg-orange-100 text-orange-800 border-orange-200",
+  },
+  {
+    name: "Lovable",
+    emoji: "💝",
+    color: "bg-pink-100 text-pink-800 border-pink-200",
+  },
+  {
+    name: "Cursor",
+    emoji: "🖱️",
+    color: "bg-blue-100 text-blue-800 border-blue-200",
+  },
+  {
+    name: "Claude Code",
+    emoji: "🤖",
+    color: "bg-orange-100 text-orange-800 border-orange-200",
+  },
+  {
+    name: "VS Code",
+    emoji: "💻",
+    color: "bg-blue-100 text-blue-800 border-blue-200",
+  },
+  {
+    name: "GitHub Copilot",
+    emoji: "🤖",
+    color: "bg-gray-100 text-gray-800 border-gray-200",
+  },
+  {
+    name: "Bolt.new",
+    emoji: "⚡",
+    color: "bg-yellow-100 text-yellow-800 border-yellow-200",
+  },
+  {
+    name: "Windsurf",
+    emoji: "🏄",
+    color: "bg-cyan-100 text-cyan-800 border-cyan-200",
+  },
+  {
     name: "React",
     emoji: "⚛️",
     color: "bg-blue-100 text-blue-800 border-blue-200",

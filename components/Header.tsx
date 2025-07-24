@@ -48,6 +48,12 @@ const Header = () => {
               פרויקטים
             </Link>
             <Link
+              href="/search"
+              className="text-gray-600 hover:text-gray-900 transition-colors"
+            >
+              חיפוש
+            </Link>
+            <Link
               href="/daily-winners"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
@@ -122,6 +128,13 @@ const Header = () => {
                 onClick={() => setIsMobileMenuOpen(false)}
               >
                 פרויקטים
+              </Link>
+              <Link
+                href="/search"
+                className="px-4 py-2 text-gray-600 hover:text-gray-900 hover:bg-gray-50 transition-colors"
+                onClick={() => setIsMobileMenuOpen(false)}
+              >
+                חיפוש
               </Link>
               <Link
                 href="/daily-winners"
