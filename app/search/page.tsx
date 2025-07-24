@@ -1,15 +1,142 @@
 "use client";
 
-import { Search, Filter, X } from "lucide-react";
+import { Search, Filter, X, ChevronDown } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+import {
+  Pagination,
+  PaginationContent,
+  PaginationEllipsis,
+  PaginationItem,
+  PaginationLink,
+  PaginationNext,
+  PaginationPrevious,
+} from "@/components/ui/pagination";
 import { techOptions, getTechnologyStyle } from "@/lib/technologies";
 import { useQueryState } from "nuqs";
 import { useSearchProjects } from "@/hooks/use-search-projects";
 import { SearchProjectCard } from "@/components/SearchProjectCard";
 import { useDebounce } from "@/hooks/use-debounce";
+import { useState } from "react";
+
+const sortOptions = [
+  {
+    value: "createdAt-desc",
+    label: "חדש ביותר",
+    description: "לפי תאריך יצירה (חדש)",
+  },
+  {
+    value: "createdAt-asc",
+    label: "ישן ביותר",
+    description: "לפי תאריך יצירה (ישן)",
+  },
+  {
+    value: "votes-desc",
+    label: "הכי פופולרי",
+    description: "לפי הצבעות (גבוה)",
+  },
+  {
+    value: "votes-asc",
+    label: "הכי פחות פופולרי",
+    description: "לפי הצבעות (נמוך)",
+  },
+  { value: "title-asc", label: "א-ב", description: "לפי שם (א-ב)" },
+  { value: "title-desc", label: "ת-א", description: "לפי שם (ת-א)" },
+];
+
+// Filters Component
+function FiltersSection({
+  availableFilters,
+  selectedFilters,
+  onFilterToggle,
+  onClearFilters,
+}: {
+  availableFilters: string[];
+  selectedFilters: string[];
+  onFilterToggle: (filter: string) => void;
+  onClearFilters: () => void;
+}) {
+  const [showAllFilters, setShowAllFilters] = useState(false);
+  const initialFilterCount = 15;
+  const displayedFilters = showAllFilters
+    ? availableFilters
+    : availableFilters.slice(0, initialFilterCount);
+  const hasMoreFilters = availableFilters.length > initialFilterCount;
+
+  return (
+    <div className="flex-1 space-y-4">
+      <div className="flex items-center gap-2">
+        <Filter className="h-5 w-5 text-gray-500" />
+        <h3 className="font-semibold text-gray-700">סנן לפי טכנולוגיה:</h3>
+        {selectedFilters.length > 0 && (
+          <Button
+            variant="ghost"
+            size="sm"
+            onClick={onClearFilters}
+            className="text-red-600 hover:text-red-700"
+          >
+            <X className="h-4 w-4 ml-1" />
+            נקה סינון
+          </Button>
+        )}
+      </div>
+
+      <div className="flex flex-wrap gap-2">
+        {displayedFilters.map((filter) => {
+          const techStyle = getTechnologyStyle(filter);
+          const isSelected = selectedFilters.includes(filter);
+          return (
+            <Badge
+              key={filter}
+              variant={isSelected ? "default" : "outline"}
+              className={`cursor-pointer transition-all border ${
+                isSelected
+                  ? "bg-blue-600 hover:bg-blue-700 text-white scale-125"
+                  : techStyle.color
+              }`}
+              onClick={() => onFilterToggle(filter)}
+            >
+              {techStyle.emoji && (
+                <span className="ml-1">{techStyle.emoji}</span>
+              )}
+              {filter}
+            </Badge>
+          );
+        })}
+      </div>
+
+      {hasMoreFilters && (
+        <Button
+          variant="outline"
+          size="sm"
+          onClick={() => setShowAllFilters(!showAllFilters)}
+          className="mt-2"
+        >
+          {showAllFilters ? (
+            <>
+              <ChevronDown className="h-4 w-4 ml-1 rotate-180" />
+              הצג פחות
+            </>
+          ) : (
+            <>
+              <ChevronDown className="h-4 w-4 ml-1" />
+              הצג עוד ({availableFilters.length - initialFilterCount} נוספים)
+            </>
+          )}
+        </Button>
+      )}
+    </div>
+  );
+}
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useQueryState("q");
@@ -18,6 +145,24 @@ export default function SearchPage() {
     defaultValue: [] as string[],
     parse: (value) => (value ? value.split(",").filter(Boolean) : []),
     serialize: (value) => (value.length > 0 ? value.join(",") : ""),
+  });
+
+  const [currentPage, setCurrentPage] = useQueryState("page", {
+    defaultValue: 1,
+    parse: (value) => parseInt(value) || 1,
+    serialize: (value) => value.toString(),
+  });
+
+  const [sortBy, setSortBy] = useQueryState("sortBy", {
+    defaultValue: "createdAt",
+    parse: (value) => value || "createdAt",
+    serialize: (value) => value,
+  });
+
+  const [sortOrder, setSortOrder] = useQueryState("sortOrder", {
+    defaultValue: "desc",
+    parse: (value) => value || "desc",
+    serialize: (value) => value,
   });
 
   const availableFilters = techOptions.map((tech) => tech.name);
@@ -30,7 +175,10 @@ export default function SearchPage() {
   } = useSearchProjects({
     q: searchQuery || undefined,
     filters: selectedFilters,
+    page: currentPage,
     limit: 12,
+    sortBy: sortBy as "createdAt" | "votes" | "title",
+    sortOrder: sortOrder as "asc" | "desc",
   });
 
   // Track if user is currently typing (for debounce indicator)
@@ -43,16 +191,79 @@ export default function SearchPage() {
         ? prev.filter((f) => f !== filter)
         : [...prev, filter]
     );
+    // Reset to first page when filters change
+    setCurrentPage(1);
   };
 
   const clearFilters = () => {
     setSelectedFilters([]);
+    setCurrentPage(1);
   };
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
     // Search is now handled automatically through URL state
     // The search query and filters are already in the URL
+    setCurrentPage(1); // Reset to first page when search changes
+  };
+
+  const handleSortChange = (value: string) => {
+    const [newSortBy, newSortOrder] = value.split("-") as [
+      "createdAt" | "votes" | "title",
+      "asc" | "desc"
+    ];
+    setSortBy(newSortBy);
+    setSortOrder(newSortOrder);
+    setCurrentPage(1); // Reset to first page when sort changes
+  };
+
+  const handlePageChange = (page: number) => {
+    setCurrentPage(page);
+    // Scroll to top when page changes
+    window.scrollTo({ top: 0, behavior: "smooth" });
+  };
+
+  // Get current sort option value
+  const currentSortValue = `${sortBy}-${sortOrder}`;
+
+  // Generate pagination items
+  const generatePaginationItems = () => {
+    if (!searchResults?.pagination) return [];
+
+    const { page, totalPages } = searchResults.pagination;
+    const items = [];
+
+    // Always show first page
+    if (page > 1) {
+      items.push(1);
+    }
+
+    // Show ellipsis if there's a gap
+    if (page > 3) {
+      items.push("ellipsis-start");
+    }
+
+    // Show pages around current page
+    const start = Math.max(2, page - 1);
+    const end = Math.min(totalPages - 1, page + 1);
+
+    for (let i = start; i <= end; i++) {
+      if (i > 1 && i < totalPages) {
+        items.push(i);
+      }
+    }
+
+    // Show ellipsis if there's a gap
+    if (page < totalPages - 2) {
+      items.push("ellipsis-end");
+    }
+
+    // Always show last page
+    if (page < totalPages) {
+      items.push(totalPages);
+    }
+
+    return items;
   };
 
   return (
@@ -93,48 +304,41 @@ export default function SearchPage() {
                 )}
               </div>
 
-              {/* Filters Section */}
-              <div className="space-y-4">
-                <div className="flex items-center gap-2">
-                  <Filter className="h-5 w-5 text-gray-500" />
-                  <h3 className="font-semibold text-gray-700">
-                    סנן לפי טכנולוגיה:
-                  </h3>
-                  {selectedFilters.length > 0 && (
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      onClick={clearFilters}
-                      className="text-red-600 hover:text-red-700"
-                    >
-                      <X className="h-4 w-4 ml-1" />
-                      נקה סינון
-                    </Button>
-                  )}
-                </div>
+              {/* Filters and Sort Section */}
+              <div className="flex flex-col gap-4">
+                {/* Filters Section */}
+                <FiltersSection
+                  availableFilters={availableFilters}
+                  selectedFilters={selectedFilters}
+                  onFilterToggle={handleFilterToggle}
+                  onClearFilters={clearFilters}
+                />
 
-                <div className="flex flex-wrap gap-2">
-                  {availableFilters.map((filter) => {
-                    const techStyle = getTechnologyStyle(filter);
-                    const isSelected = selectedFilters.includes(filter);
-                    return (
-                      <Badge
-                        key={filter}
-                        variant={isSelected ? "default" : "outline"}
-                        className={`cursor-pointer transition-all border ${
-                          isSelected
-                            ? "bg-blue-600 hover:bg-blue-700 text-white scale-125"
-                            : techStyle.color
-                        }`}
-                        onClick={() => handleFilterToggle(filter)}
-                      >
-                        {techStyle.emoji && (
-                          <span className="ml-1">{techStyle.emoji}</span>
-                        )}
-                        {filter}
-                      </Badge>
-                    );
-                  })}
+                {/* Sort Section */}
+                <div className="lg:w-64 space-y-2">
+                  <label className="text-sm font-medium text-gray-700">
+                    מיון:
+                  </label>
+                  <Select
+                    value={currentSortValue}
+                    onValueChange={handleSortChange}
+                  >
+                    <SelectTrigger className="w-full">
+                      <SelectValue />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {sortOptions.map((option) => (
+                        <SelectItem key={option.value} value={option.value}>
+                          <div className="flex flex-col">
+                            <span className="font-medium">{option.label}</span>
+                            <span className="text-xs text-gray-500">
+                              {option.description}
+                            </span>
+                          </div>
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
                 </div>
               </div>
             </form>
@@ -176,24 +380,105 @@ export default function SearchPage() {
                 <p className="text-red-600">שגיאה בחיפוש פרויקטים</p>
               </div>
             ) : searchResults?.data && searchResults.data.length > 0 ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {searchResults.data.map((project) => (
-                  <SearchProjectCard
-                    key={project.id}
-                    id={project.id.toString()}
-                    title={project.title}
-                    description={project.description}
-                    image={project.image || "/placeholder.svg"}
-                    author={{
-                      name: project.author.name,
-                      avatar: project.author.avatar || "",
-                      id: project.author.id,
-                    }}
-                    technologies={project.technologies || []}
-                    totalVotes={project.votes}
-                  />
-                ))}
-              </div>
+              <>
+                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                  {searchResults.data.map((project) => (
+                    <SearchProjectCard
+                      key={project.id}
+                      id={project.id.toString()}
+                      title={project.title}
+                      description={project.description}
+                      image={project.image || "/placeholder.svg"}
+                      author={{
+                        name: project.author.name,
+                        avatar: project.author.avatar || "",
+                        id: project.author.id,
+                      }}
+                      technologies={project.technologies || []}
+                      totalVotes={project.votes}
+                    />
+                  ))}
+                </div>
+
+                {/* Pagination */}
+                {searchResults.pagination &&
+                  searchResults.pagination.totalPages > 1 && (
+                    <div className="mt-8">
+                      <Pagination>
+                        <PaginationContent>
+                          {/* Previous Button */}
+                          <PaginationItem>
+                            <PaginationPrevious
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (currentPage > 1) {
+                                  handlePageChange(currentPage - 1);
+                                }
+                              }}
+                              className={
+                                currentPage <= 1
+                                  ? "pointer-events-none opacity-50"
+                                  : ""
+                              }
+                            />
+                          </PaginationItem>
+
+                          {/* Page Numbers */}
+                          {generatePaginationItems().map((item, index) => (
+                            <PaginationItem key={index}>
+                              {item === "ellipsis-start" ||
+                              item === "ellipsis-end" ? (
+                                <PaginationEllipsis />
+                              ) : (
+                                <PaginationLink
+                                  href="#"
+                                  onClick={(e) => {
+                                    e.preventDefault();
+                                    handlePageChange(item as number);
+                                  }}
+                                  isActive={currentPage === item}
+                                >
+                                  {item}
+                                </PaginationLink>
+                              )}
+                            </PaginationItem>
+                          ))}
+
+                          {/* Next Button */}
+                          <PaginationItem>
+                            <PaginationNext
+                              href="#"
+                              onClick={(e) => {
+                                e.preventDefault();
+                                if (
+                                  currentPage <
+                                  searchResults.pagination.totalPages
+                                ) {
+                                  handlePageChange(currentPage + 1);
+                                }
+                              }}
+                              className={
+                                currentPage >=
+                                searchResults.pagination.totalPages
+                                  ? "pointer-events-none opacity-50"
+                                  : ""
+                              }
+                            />
+                          </PaginationItem>
+                        </PaginationContent>
+                      </Pagination>
+
+                      {/* Page Info */}
+                      <div className="text-center mt-4 text-sm text-gray-600">
+                        עמוד {currentPage} מתוך{" "}
+                        {searchResults.pagination.totalPages}
+                        {" • "}
+                        {searchResults.pagination.total} פרויקטים בסך הכל
+                      </div>
+                    </div>
+                  )}
+              </>
             ) : (
               <div className="text-center py-8">
                 <p className="text-gray-600">לא נמצאו פרויקטים</p>
