@@ -42,16 +42,10 @@ const Header = () => {
 
           <nav className="hidden md:flex items-center gap-6">
             <Link
-              href="/"
-              className="text-gray-600 hover:text-gray-900 transition-colors"
-            >
-              פרויקטים
-            </Link>
-            <Link
               href="/search"
               className="text-gray-600 hover:text-gray-900 transition-colors"
             >
-              חיפוש
+              פרויקטים
             </Link>
             <Link
               href="/daily-winners"

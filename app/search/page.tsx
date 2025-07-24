@@ -1,6 +1,5 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import { Search, Filter, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -8,6 +7,9 @@ import { Badge } from "@/components/ui/badge";
 import { Card, CardContent } from "@/components/ui/card";
 import { techOptions, getTechnologyStyle } from "@/lib/technologies";
 import { useQueryState } from "nuqs";
+import { useSearchProjects } from "@/hooks/use-search-projects";
+import { SearchProjectCard } from "@/components/SearchProjectCard";
+import { useDebounce } from "@/hooks/use-debounce";
 
 export default function SearchPage() {
   const [searchQuery, setSearchQuery] = useQueryState("q");
@@ -19,7 +21,21 @@ export default function SearchPage() {
   });
 
   const availableFilters = techOptions.map((tech) => tech.name);
-  const [isSearching, setIsSearching] = useState(false);
+
+  // Use the search hook
+  const {
+    data: searchResults,
+    isLoading,
+    error,
+  } = useSearchProjects({
+    q: searchQuery || undefined,
+    filters: selectedFilters,
+    limit: 12,
+  });
+
+  // Track if user is currently typing (for debounce indicator)
+  const debouncedSearchQuery = useDebounce(searchQuery, 300);
+  const isTyping = searchQuery !== debouncedSearchQuery;
 
   const handleFilterToggle = (filter: string) => {
     setSelectedFilters((prev) =>
@@ -64,8 +80,17 @@ export default function SearchPage() {
                   placeholder="חפש פרויקטים, טכנולוגיות, או מפתחים..."
                   value={searchQuery}
                   onChange={(e) => setSearchQuery(e.target.value)}
-                  className="h-14 text-lg pr-12 pl-4 border-2 border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200 transition-all"
+                  className={`h-14 text-lg pr-12 pl-4 border-2 transition-all ${
+                    isTyping
+                      ? "border-orange-300 focus:border-orange-500 focus:ring-2 focus:ring-orange-200"
+                      : "border-gray-200 focus:border-blue-500 focus:ring-2 focus:ring-blue-200"
+                  }`}
                 />
+                {isTyping && (
+                  <div className="absolute left-4 top-1/2 transform -translate-y-1/2">
+                    <div className="w-2 h-2 bg-orange-500 rounded-full animate-pulse"></div>
+                  </div>
+                )}
               </div>
 
               {/* Filters Section */}
@@ -98,7 +123,7 @@ export default function SearchPage() {
                         variant={isSelected ? "default" : "outline"}
                         className={`cursor-pointer transition-all border ${
                           isSelected
-                            ? "bg-blue-600 hover:bg-blue-700 text-white"
+                            ? "bg-blue-600 hover:bg-blue-700 text-white scale-125"
                             : techStyle.color
                         }`}
                         onClick={() => handleFilterToggle(filter)}
@@ -111,18 +136,6 @@ export default function SearchPage() {
                     );
                   })}
                 </div>
-              </div>
-
-              {/* Search Button */}
-              <div className="flex justify-center">
-                <Button
-                  type="submit"
-                  size="lg"
-                  className="bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700 px-8 py-3 text-lg"
-                >
-                  <Search className="h-5 w-5 ml-2" />
-                  חפש פרויקטים
-                </Button>
               </div>
             </form>
           </CardContent>
@@ -137,38 +150,53 @@ export default function SearchPage() {
                   ? `תוצאות חיפוש עבור "${searchQuery}"`
                   : "פרויקטים מסוננים"}
               </h2>
-              <p className="text-gray-600">
-                {selectedFilters.length > 0 &&
-                  `עם סינון: ${selectedFilters.join(", ")}`}
-              </p>
+              <div className="text-gray-600">
+                {searchResults?.pagination && (
+                  <p>
+                    נמצאו {searchResults.pagination.total} פרויקטים
+                    {selectedFilters.length > 0 &&
+                      ` עם סינון: ${selectedFilters.join(", ")}`}
+                  </p>
+                )}
+              </div>
             </div>
 
-            {isSearching ? (
+            {isTyping ? (
+              <div className="text-center py-8">
+                <div className="inline-block animate-pulse rounded-full h-8 w-8 bg-gray-300"></div>
+                <p className="mt-2 text-gray-600">מקליד...</p>
+              </div>
+            ) : isLoading ? (
               <div className="text-center py-8">
                 <div className="inline-block animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
                 <p className="mt-2 text-gray-600">מחפש פרויקטים...</p>
               </div>
-            ) : (
-              /* Placeholder for search results */
+            ) : error ? (
+              <div className="text-center py-8">
+                <p className="text-red-600">שגיאה בחיפוש פרויקטים</p>
+              </div>
+            ) : searchResults?.data && searchResults.data.length > 0 ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {[1, 2, 3, 4, 5, 6].map((item) => (
-                  <Card
-                    key={item}
-                    className="hover:shadow-lg transition-shadow"
-                  >
-                    <CardContent className="p-6">
-                      <div className="space-y-3">
-                        <div className="h-4 bg-gray-200 rounded animate-pulse"></div>
-                        <div className="h-3 bg-gray-200 rounded w-3/4 animate-pulse"></div>
-                        <div className="h-3 bg-gray-200 rounded w-1/2 animate-pulse"></div>
-                        <div className="flex gap-2">
-                          <div className="h-6 bg-gray-200 rounded w-16 animate-pulse"></div>
-                          <div className="h-6 bg-gray-200 rounded w-20 animate-pulse"></div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                {searchResults.data.map((project) => (
+                  <SearchProjectCard
+                    key={project.id}
+                    id={project.id.toString()}
+                    title={project.title}
+                    description={project.description}
+                    image={project.image || "/placeholder.svg"}
+                    author={{
+                      name: project.author.name,
+                      avatar: project.author.avatar || "",
+                      id: project.author.id,
+                    }}
+                    technologies={project.technologies || []}
+                    totalVotes={project.votes}
+                  />
                 ))}
+              </div>
+            ) : (
+              <div className="text-center py-8">
+                <p className="text-gray-600">לא נמצאו פרויקטים</p>
               </div>
             )}
           </div>
