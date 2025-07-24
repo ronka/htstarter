@@ -128,7 +128,7 @@ export const SearchProjectCard = ({
           </div>
 
           <div className="flex items-center justify-between text-sm">
-            <span className="text-gray-600">{totalVotes} קולות סה"כ</span>
+            <span className="text-gray-600">{totalVotes} קולות סה&quot;כ</span>
             <div className="flex flex-wrap gap-1">
               {technologies.slice(0, 2).map((tech) => (
                 <Badge
