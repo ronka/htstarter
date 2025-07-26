@@ -4,6 +4,7 @@ import { users, projects } from "../../../../db/schema";
 import { eq } from "drizzle-orm";
 import { z } from "zod";
 import { requireAuth, isAuthorized } from "../../../../lib/auth";
+import emojiRegex from "emoji-regex";
 
 // Validation schema for creating/updating a user
 const userSchema = z.object({
@@ -16,9 +17,14 @@ const userSchema = z.object({
   twitter: z.string().optional(),
   avatar: z
     .string()
-    .regex(
-      /^(?:(?:\p{Emoji_Presentation}|\p{Emoji}\uFE0F)|(?:\p{Regional_Indicator}\p{Regional_Indicator}))$/u,
-      "Avatar must be a emoji character"
+    .refine(
+      (val) => {
+        if (!val) return true; // allow empty/optional
+        const emojiRe = emojiRegex();
+        const matches = [...val.matchAll(emojiRe)];
+        return matches.length === 1 && matches[0][0] === val;
+      },
+      { message: "Avatar must be a single emoji character" }
     )
     .optional(),
   skills: z.array(z.string()).optional(),
